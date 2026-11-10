@@ -1,0 +1,16 @@
+{
+  "id": "invalid-word-count-hyphen",
+  "kind": "invalid",
+  "category": "invalid",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "n/a",
+  "expr": "text.word_count('state-of-the-art design')",
+  "expected": "5",
+  "actual": {
+    "ok": true,
+    "repr": "2"
+  },
+  "failing_hidden_tests": [],
+  "visible_tests": 84
+}

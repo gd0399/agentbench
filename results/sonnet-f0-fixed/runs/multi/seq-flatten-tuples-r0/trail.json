@@ -1,0 +1,76 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a failing test and the root cause is identified (isinstance check only handles list in toolkit/seq.py line 13). It doesn't conflict with existing tests. The next step is a fix.",
+   "instructions": "In toolkit/seq.py flatten() (around line 13), change the recursion check from `isinstance(item, list)` to `isinstance(item, (list, tuple))` so tuples are flattened recursively. Keep the change minimal. If you generalise to other iterables, never recurse into str or bytes. Add a regression test to tests/test_toolkit.py, for example `seq.flatten([1, (2, 3)]) == [1, 2, 3]`. Also cover nested mixed list/tuple input and check that strings stay intact, e.g. `flatten(['ab', (1, [2])]) == ['ab', 1, 2]`. Make sure tests/test_issue_repro.py::test_flatten_tuples passes and the full test suite is green. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "escalate",
+   "reason": "coder and generalist both failed",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "coder",
+   "error": "ModelUnavailable: all models failed for coder: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "all models failed for supervisor: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_01",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  },
+  {
+   "agent": "generalist",
+   "error": "ModelUnavailable: all models failed for generalist: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 're",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: FAILED -> generalist",
+  "generalist: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.flatten does not flatten tuples: seq.flatten([1, (2, 3)]) returns [1, (2, 3)] instead of the expected [1, 2, 3]. Likely the isinstance check only handles list; it should also handle tuples (and probably other non-string iterables). Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py line 13, in flatten(): `isinstance(item, list)` only recurses into lists, so tuples are appended as-is. Fix: use `isinstance(item, (list, tuple))`. Don't recurse into str/bytes if you generalise to other iterables. No docstring or existing test covers flatten, so nothing contradicts the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_____________________________ test_flatten_tuples ______________________________\n\n    def test_flatten_tuples():\n>       assert seq.flatten([1, (2, 3)]) == [1, 2, 3]\nE       assert [1, (2, 3)] == [1, 2, 3]\nE         \nE         At index 1 diff: (2, 3) != 2\nE         Right contains one more item: 3\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_flatten_tuples - assert [1, (2, 3)] ==...\n1 failed in 0.02s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

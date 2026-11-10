@@ -1,0 +1,7 @@
+{
+  "number": 109,
+  "title": "percentile(\u2026, 100) raises ValueError",
+  "body": "### What happened?\n`stats.percentile([1, 2, 3], 100)` raises `ValueError`.\n\n### What did you expect?\nIt should return `3` (expected: `3`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

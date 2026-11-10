@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause in toolkit/text.py truncate(); no conflicting tests, so a fix can be written.",
+   "instructions": "In toolkit/text.py line 16, truncate() does `return s[:limit] + suffix`. Change it to `s[:limit - len(suffix)] + suffix` so the result, including the suffix, is at most `limit` characters. Keep the existing guard at line 12 (`limit < len(suffix)`) and leave the no-truncation cases alone: strings that already fit within limit must be returned unchanged. Do not modify report.headline, which just calls text.truncate. Check that `report.headline('the art of war', 12)` returns 'The Art o...' (12 chars; the triage said 11 but that was wrong). Check that `len(text.truncate('abcdefghijklmnop', 10)) <= 10`. Both tests in tests/test_issue_repro.py should pass, and the existing tests should still pass. Keep the repro tests as regression tests, and move them into the proper test files if that fits the repo's conventions. Also test the edge case where limit equals len(suffix) and the case where the string length equals the limit exactly."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.headline('the art of war', 12) returns 'The Art of W...' (15 chars), exceeding the 12-char limit. Expected 'The Art o...' (11 chars, which fits within the limit). The truncation appears to add the '...' suffix after cutting to the limit instead of reserving room for it, so the result is longer than the max length. Likely fix: truncate to limit minus len('...'), then append the ellipsis. Check for an off-by-one and whether text.py has a shared truncate helper involved. Add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/text.py line 16, in truncate(): `return s[:limit] + suffix` keeps `limit` characters and then appends the suffix, so the result is limit+len(suffix) long. It should be `s[:limit - len(suffix)] + suffix`. The guard `limit < len(suffix)` on line 12 already shows the limit is meant to include the suffix. report.headline (report.py:30) just calls text.truncate(title_case(title), limit), so the fix belongs in text.truncate. The expected 'The Art o...' is 12 chars, not 11 as the triage says, which matches limit=12. Existing tests only cover the no-truncation cases (short and exact), so none contradict this.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_________________________ test_headline_respects_limit _________________________\n\n    def test_headline_respects_limit():\n        out = report.headline('the art of war', 12)\n>       assert out == 'The Art o...'\nE       AssertionError: assert 'The Art of W...' == 'The Art o...'\nE         \nE         - The Art o...\nE         + The Art of W...\nE         ?          +++\n\ntests/test_issue_repro.py:6: AssertionError\n_________________________ test_truncate_respects_limit _________________________\n\n    def test_truncate_respects_limit():\n>       assert len(text.truncate('abcdefghijklmnop', 10)) <= 10\nE       AssertionError: assert 13 <= 10\nE        +  where 13 = len('abcdefghij...')\nE        +    where 'abcdefghij...' = <function truncate at 0x7fc5eb896de0>('abcdefghijklmnop', 10)\nE        +      where <function truncate at 0x7fc5eb896de0> = text.truncate\n\ntests/test_issue_repro.py:11: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_headline_respects_limit - AssertionErr...\nFAILED tests/test_issue_repro.py::test_truncate_respects_limit - AssertionErr...\n2 failed in 0.31s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was in text.truncate, which sliced `s[:limit]` and then appended the suffix. That made the result `limit + len(suffix)` characters long. The fix slices `s[:limit - len(suffix)]`, so the result never exceeds `limit`. headline() calls truncate, so it is fixed too.\n\nI checked the edge cases:\n- `limit == len(suffix)` gives just the suffix.\n- An empty suffix still works.\n- `len(s) <= limit` returns the string unchanged.\n- `limit < len(suffix)` still raises ValueError.\n\nAll 86 tests pass. No existing tests were modified, and the new tests cover the issue and the boundaries.\n\nNit: the diff includes committed `__pycache__/*.pyc` files. Drop them and add `__pycache__/` to `.gitignore` before merging. This doesn't affect the code change.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

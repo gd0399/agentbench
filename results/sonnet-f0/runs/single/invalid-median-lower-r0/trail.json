@@ -1,0 +1,17 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "Not a bug. The issue asks for a lower-median semantic, which conflicts with the existing tests.",
+  "suspected_files": [],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

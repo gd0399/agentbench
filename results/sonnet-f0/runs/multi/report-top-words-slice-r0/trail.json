@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: toolkit/report.py line 20 slices `ranked[:n - 1]` instead of `ranked[:n]`. No existing tests conflict, so a fix can go ahead.",
+   "instructions": "In toolkit/report.py, line 20 of top_words, change `return ranked[:n - 1]` to `return ranked[:n]`. Don't change the ranking, which sorts by -count and then alphabetically. Don't touch text.py or seq.py. Keep the repro test tests/test_issue_repro.py::test_top_words_returns_n as the regression test, and move or rename it into the proper test module if the repo convention calls for that. Run the full test suite and confirm it passes. Also check the edge cases n=0 and n larger than the number of words. `ranked[:n]` handles both correctly, but verify. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.top_words('z y x', 2) returns ['x'] instead of ['x', 'y']. It returns one word too few, which suggests an off-by-one in the slicing or limit logic in toolkit/report.py. It may also come from a helper in toolkit/text.py or toolkit/seq.py. Next step: have the researcher inspect top_words and its helpers, then have the coder fix it and add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 20, in top_words: `return ranked[:n - 1]` slices one element too few. It should be `ranked[:n]`. The ranking (by -count, then alphabetical) is correct. The helpers in text.py and seq.py are not involved. No existing tests cover top_words, so nothing conflicts.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_top_words_returns_n ___________________________\n\n    def test_top_words_returns_n():\n>       assert report.top_words('z y x', 2) == ['x', 'y']\nE       AssertionError: assert ['x'] == ['x', 'y']\nE         \nE         Right contains one more item: 'y'\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_top_words_returns_n - AssertionError: ...\n1 failed in 0.06s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. Changing `ranked[:n - 1]` to `ranked[:n]` fixes the off-by-one at its source. I checked the edge cases: n=0 returns [], and n larger than the number of words returns all words. Ranking is still by count descending, then alphabetical. No existing tests were changed; the diff only adds new ones. All 86 tests pass. The new tests cover the issue repro, ranking, n=0 and n larger than the word count.\n\nMinor: the diff includes `__pycache__/*.pyc` files. Make sure they aren't committed, and add them to .gitignore if they aren't already ignored.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

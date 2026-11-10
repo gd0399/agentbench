@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "stats",
+  "summary": "stats.moving_average([1, 2], 0) raises ZeroDivisionError instead of ValueError. Input validation is missing for window <= 0. Fix: add an explicit check that raises ValueError for a non-positive window, and add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 62, moving_average(): the guard is `if window < 0`, so window == 0 passes validation. The loop then computes `/ window` with window=0 (line 66) and raises ZeroDivisionError. The error message says \"window must be positive\", so the guard should be `window <= 0`. No existing tests or docs conflict: tests only use windows 2 and 3.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n______________ test_moving_average_zero_window_raises_value_error ______________\n\n    def test_moving_average_zero_window_raises_value_error():\n        with pytest.raises(ValueError):\n>           stats.moving_average([1, 2], 0)\n\ntests/test_issue_repro.py:7: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [1, 2], window = 0\n\n    def moving_average(values, window):\n        if window < 0:\n            raise ValueError(\"window must be positive\")\n        out = []\n        for i in range(len(values) - window + 1):\n>           out.append(sum(values[i:i + window]) / window)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           ZeroDivisionError: division by zero\n\ntoolkit/stats.py:66: ZeroDivisionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_moving_average_zero_window_raises_value_error\n1 failed in 0.21s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. The guard in `moving_average` was `window < 0`, so 0 got past it and hit `/ window`. Changing it to `window <= 0` fixes that cause directly. It is not special-cased to the repro input. All 84 tests pass, and the existing tests were not changed. The new regression test in tests/test_issue_repro.py is reasonable. Valid windows behave as before, and a window larger than the sequence still returns [].\n\nNit: the diff includes committed __pycache__/*.pyc files. Drop them before merging, and consider adding a .gitignore. They don't affect behaviour.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

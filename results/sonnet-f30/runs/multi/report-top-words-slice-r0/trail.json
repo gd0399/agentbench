@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: an off-by-one slice in toolkit/report.py line 20. No patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/report.py, function top_words (around line 20), change `return ranked[:n - 1]` to `return ranked[:n]`. Keep the ranking by (-count, word) as is. Make sure tests/test_issue_repro.py::test_top_words_returns_n passes and the existing tests still pass. n=0 should return an empty list; consider adding a small test for that. Also guard against negative n if that fits the existing style. Keep the diff minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "top_words returns one word too few"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 20, in top_words: `return ranked[:n - 1]` slices one element too few. It should be `ranked[:n]`. Ranking by (-count, word) is correct. Note that n=0 would give ranked[:-1], which returns almost everything, so the fix also corrects that case.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_top_words_returns_n ___________________________\n\n    def test_top_words_returns_n():\n>       assert report.top_words('z y x', 2) == ['x', 'y']\nE       AssertionError: assert ['x'] == ['x', 'y']\nE         \nE         Right contains one more item: 'y'\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_top_words_returns_n - AssertionError: ...\n1 failed in 0.20s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and addresses the root cause. `ranked[:n - 1]` was an off-by-one, and `ranked[:max(n, 0)]` fixes it. I ran the tests and probed edge cases:\n- `top_words('z y x', 2)` returns `['x', 'y']`.\n- n=0 and n=-1 return `[]`.\n- An empty string returns `[]`.\n- `top_words('a a b', 1)` returns `['a']`.\n- All 83 tests pass.\n\nThe `max(n, 0)` clamp is a small addition beyond the minimal change. Without it, a negative n would slice off the tail, so I think it's justified. The new test in `tests/test_issue_repro.py` is a legitimate regression test, and no existing tests were modified.\n\nNits that shouldn't block the merge:\n- The diff contains `__pycache__/*.pyc` files. Please don't commit them, and consider adding a `.gitignore`.\n- Add an n=0 test, since you changed that behaviour. Consider moving the repro test into `test_toolkit.py`.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

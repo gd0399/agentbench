@@ -1,0 +1,66 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..840f6dc
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..e49274a
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..f987724
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..362df49
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,7 @@
++from toolkit import seq
++
++
++def test_merge_sorted_uneven():
++    assert seq.merge_sorted([1], [2, 3]) == [1, 2, 3]
++    assert seq.merge_sorted([2, 3], [1]) == [1, 2, 3]
++    assert seq.merge_sorted([], [1]) == [1]
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..a98dded
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..466ecf3
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..77f9e88
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..da0ca65
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..8ee0cb8
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..952a30d
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..2a17a4d
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/seq.py b/toolkit/seq.py
+index 82d0a61..47c7427 100644
+--- a/toolkit/seq.py
++++ b/toolkit/seq.py
+@@ -59,7 +59,7 @@ def binary_search(items, target):
+ def merge_sorted(a, b):
+     i = j = 0
+     out = []
+-    while i < len(a) or j < len(b):
++    while i < len(a) and j < len(b):
+         if a[i] <= b[j]:
+             out.append(a[i])
+             i += 1

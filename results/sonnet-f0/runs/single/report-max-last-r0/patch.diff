@@ -1,0 +1,64 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..8a0e238
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..cad923b
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..10f2c6d
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..fe9b809
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import report
++
++
++def test_summarize_max_unsorted():
++    assert report.summarize([3, 9, 2]) == {"count": 3, "mean": 4.67, "median": 3, "max": 9}
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..0a5dc91
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..36ddd85
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..116d0b4
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..8bc3990
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..c7a3996
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..2281576
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..279ce3b
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/report.py b/toolkit/report.py
+index a3c1604..e340a64 100644
+--- a/toolkit/report.py
++++ b/toolkit/report.py
+@@ -7,7 +7,7 @@ def summarize(values):
+         "count": len(values),
+         "mean": round(stats.mean(values), 2),
+         "median": stats.median(values),
+-        "max": values[-1],
++        "max": max(values),
+     }
+ 
+ 

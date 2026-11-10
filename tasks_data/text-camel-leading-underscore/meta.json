@@ -1,0 +1,18 @@
+{
+  "id": "text-camel-leading-underscore",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.camel_to_snake('Value')",
+  "expected": "'value'",
+  "actual": {
+    "ok": true,
+    "repr": "'_value'"
+  },
+  "failing_hidden_tests": [
+    "test_camel_to_snake_leading"
+  ],
+  "visible_tests": 83
+}

@@ -1,0 +1,16 @@
+{
+  "id": "invalid-leap-1900",
+  "kind": "invalid",
+  "category": "invalid",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "n/a",
+  "expr": "dates.is_leap_year(1900)",
+  "expected": "True",
+  "actual": {
+    "ok": true,
+    "repr": "False"
+  },
+  "failing_hidden_tests": [],
+  "visible_tests": 84
+}

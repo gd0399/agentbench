@@ -1,0 +1,1232 @@
+[
+  {
+    "id": "stats-mean-denominator",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.mean([1, 2, 3, 4])",
+    "expected": "2.5",
+    "actual": {
+      "ok": true,
+      "repr": "3.3333333333333335"
+    },
+    "failing_hidden_tests": [
+      "test_mean_basic",
+      "test_mean_single",
+      "test_summarize",
+      "test_summarize_unsorted",
+      "test_variance_population",
+      "test_variance_sample"
+    ],
+    "visible_tests": 78
+  },
+  {
+    "id": "stats-median-even-window",
+    "kind": "bug",
+    "category": "cross-module",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "report.summarize([1, 2, 3, 4])",
+    "expected": "{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}",
+    "actual": {
+      "ok": true,
+      "repr": "{'count': 4, 'mean': 2.5, 'median': 3.5, 'max': 4}"
+    },
+    "failing_hidden_tests": [
+      "test_median_even",
+      "test_summarize"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "stats-median-parity",
+    "kind": "bug",
+    "category": "operator",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.median([3, 1, 2])",
+    "expected": "2",
+    "actual": {
+      "ok": true,
+      "repr": "1.5"
+    },
+    "failing_hidden_tests": [
+      "test_median_even",
+      "test_median_odd",
+      "test_summarize",
+      "test_summarize_unsorted"
+    ],
+    "visible_tests": 80
+  },
+  {
+    "id": "stats-median-float-index",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.median([3, 1, 2])",
+    "expected": "2",
+    "actual": {
+      "ok": false,
+      "exc": "TypeError"
+    },
+    "failing_hidden_tests": [
+      "test_median_even",
+      "test_median_odd",
+      "test_summarize",
+      "test_summarize_unsorted"
+    ],
+    "visible_tests": 80
+  },
+  {
+    "id": "stats-mode-counting",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.mode([1, 2, 2, 3])",
+    "expected": "2",
+    "actual": {
+      "ok": true,
+      "repr": "1"
+    },
+    "failing_hidden_tests": [
+      "test_mode_basic"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-variance-population",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.variance([2, 4, 4, 4, 5, 5, 7, 9])",
+    "expected": "4.571428571428571",
+    "actual": {
+      "ok": true,
+      "repr": "4.0"
+    },
+    "failing_hidden_tests": [
+      "test_variance_sample"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-variance-guard",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.variance([1, 2, 3])",
+    "expected": "1.0",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_variance_sample"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-percentile-ceil",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.percentile([15, 20, 35, 40, 50], 30)",
+    "expected": "20",
+    "actual": {
+      "ok": true,
+      "repr": "15"
+    },
+    "failing_hidden_tests": [
+      "test_percentile_rounds_up"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-percentile-bound",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.percentile([1, 2, 3], 100)",
+    "expected": "3",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_percentile_max"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-percentile-index",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.percentile([15, 20, 35, 40, 50], 40)",
+    "expected": "20",
+    "actual": {
+      "ok": true,
+      "repr": "35"
+    },
+    "failing_hidden_tests": [
+      "test_percentile_max",
+      "test_percentile_mid",
+      "test_percentile_rounds_up"
+    ],
+    "visible_tests": 81
+  },
+  {
+    "id": "stats-moving-average-range",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.moving_average([2, 4, 6], 3)",
+    "expected": "[4.0]",
+    "actual": {
+      "ok": true,
+      "repr": "[]"
+    },
+    "failing_hidden_tests": [
+      "test_moving_average",
+      "test_moving_average_full"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "stats-moving-average-zero",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.moving_average([1, 2], 0)",
+    "expected": "raise ValueError",
+    "actual": {
+      "ok": false,
+      "exc": "ZeroDivisionError"
+    },
+    "failing_hidden_tests": [
+      "test_moving_average_bad"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "stats-clamp-swapped",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "hard",
+    "expr": "stats.clamp(5, 0, 10)",
+    "expected": "5",
+    "actual": {
+      "ok": true,
+      "repr": "0"
+    },
+    "failing_hidden_tests": [
+      "test_clamp_high",
+      "test_clamp_inside"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "stats-clamp-equal-bounds",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "easy",
+    "expr": "stats.clamp(3, 3, 3)",
+    "expected": "3",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_clamp_equal_bounds"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-slugify-trailing-dash",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.slugify('  Hello, World! ')",
+    "expected": "'hello-world'",
+    "actual": {
+      "ok": true,
+      "repr": "'hello-world-'"
+    },
+    "failing_hidden_tests": [
+      "test_slugify"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-slugify-digits",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "easy",
+    "expr": "text.slugify('Top 10 Tips')",
+    "expected": "'top-10-tips'",
+    "actual": {
+      "ok": true,
+      "repr": "'top-tips'"
+    },
+    "failing_hidden_tests": [
+      "test_slugify_digits"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-truncate-exact",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "easy",
+    "expr": "text.truncate('hello', 5)",
+    "expected": "'hello'",
+    "actual": {
+      "ok": true,
+      "repr": "'he...'"
+    },
+    "failing_hidden_tests": [
+      "test_truncate_exact"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-truncate-suffix-room",
+    "kind": "bug",
+    "category": "cross-module",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "report.headline('the art of war', 12)",
+    "expected": "'The Art o...'",
+    "actual": {
+      "ok": true,
+      "repr": "'The Art of W...'"
+    },
+    "failing_hidden_tests": [
+      "test_headline",
+      "test_truncate_long"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "text-word-count-split",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "easy",
+    "expr": "text.word_count('  the quick  brown fox ')",
+    "expected": "4",
+    "actual": {
+      "ok": true,
+      "repr": "8"
+    },
+    "failing_hidden_tests": [
+      "test_word_count",
+      "test_word_count_empty"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "text-palindrome-case",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.is_palindrome('Racecar')",
+    "expected": "True",
+    "actual": {
+      "ok": true,
+      "repr": "False"
+    },
+    "failing_hidden_tests": [
+      "test_palindrome_true"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-title-case-first-word",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.title_case('the lord of the rings')",
+    "expected": "'The Lord of the Rings'",
+    "actual": {
+      "ok": true,
+      "repr": "'the Lord of the Rings'"
+    },
+    "failing_hidden_tests": [
+      "test_headline",
+      "test_title_case",
+      "test_title_case_first_minor"
+    ],
+    "visible_tests": 81
+  },
+  {
+    "id": "text-title-case-rest-lower",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.title_case('hELLO wORLD')",
+    "expected": "'Hello World'",
+    "actual": {
+      "ok": true,
+      "repr": "'HELLO WORLD'"
+    },
+    "failing_hidden_tests": [
+      "test_title_case_mixed"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-vowels-missing-u",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "easy",
+    "expr": "text.count_vowels('Education')",
+    "expected": "5",
+    "actual": {
+      "ok": true,
+      "repr": "4"
+    },
+    "failing_hidden_tests": [
+      "test_count_vowels"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-vowels-case",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.count_vowels('Education')",
+    "expected": "5",
+    "actual": {
+      "ok": true,
+      "repr": "4"
+    },
+    "failing_hidden_tests": [
+      "test_count_vowels"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-initials-upper",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.initials('ada lovelace')",
+    "expected": "'AL'",
+    "actual": {
+      "ok": true,
+      "repr": "'al'"
+    },
+    "failing_hidden_tests": [
+      "test_initials"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "text-camel-leading-underscore",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "hard",
+    "expr": "text.camel_to_snake('Value')",
+    "expected": "'value'",
+    "actual": {
+      "ok": true,
+      "repr": "'_value'"
+    },
+    "failing_hidden_tests": [
+      "test_camel_to_snake_leading"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-chunk-last",
+    "kind": "bug",
+    "category": "cross-module",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "report.pages(list(range(5)), 2)",
+    "expected": "3",
+    "actual": {
+      "ok": true,
+      "repr": "2"
+    },
+    "failing_hidden_tests": [
+      "test_chunk",
+      "test_pages"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "seq-flatten-tuples",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.flatten([1, (2, 3)])",
+    "expected": "[1, 2, 3]",
+    "actual": {
+      "ok": true,
+      "repr": "[1, (2, 3)]"
+    },
+    "failing_hidden_tests": [
+      "test_flatten"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-flatten-recursion",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.flatten([1, [2, [3]]])",
+    "expected": "[1, 2, 3]",
+    "actual": {
+      "ok": true,
+      "repr": "[1, 2, [3]]"
+    },
+    "failing_hidden_tests": [
+      "test_flatten"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-dedupe-seen",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.dedupe([3, 1, 3, 2, 1])",
+    "expected": "[3, 1, 2]",
+    "actual": {
+      "ok": true,
+      "repr": "[3, 1, 3, 2, 1]"
+    },
+    "failing_hidden_tests": [
+      "test_dedupe_order"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-rotate-direction",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.rotate([1, 2, 3, 4, 5], 2)",
+    "expected": "[4, 5, 1, 2, 3]",
+    "actual": {
+      "ok": true,
+      "repr": "[3, 4, 5, 1, 2]"
+    },
+    "failing_hidden_tests": [
+      "test_rotate",
+      "test_rotate_wrap"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "seq-rotate-empty",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.rotate([], 3)",
+    "expected": "[]",
+    "actual": {
+      "ok": false,
+      "exc": "ZeroDivisionError"
+    },
+    "failing_hidden_tests": [
+      "test_rotate_empty"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-window-range",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.sliding_window([1, 2, 3, 4], 3)",
+    "expected": "[(1, 2, 3), (2, 3, 4)]",
+    "actual": {
+      "ok": true,
+      "repr": "[(1, 2, 3)]"
+    },
+    "failing_hidden_tests": [
+      "test_sliding_window"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-bsearch-loop-cond",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "easy",
+    "expr": "seq.binary_search([1, 3, 5, 7, 9], 9)",
+    "expected": "4",
+    "actual": {
+      "ok": true,
+      "repr": "-1"
+    },
+    "failing_hidden_tests": [
+      "test_binary_search_edges"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-bsearch-hi",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "easy",
+    "expr": "seq.binary_search([1, 3, 5, 7, 9], 9)",
+    "expected": "4",
+    "actual": {
+      "ok": true,
+      "repr": "-1"
+    },
+    "failing_hidden_tests": [
+      "test_binary_search_edges"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "seq-bsearch-hang",
+    "kind": "bug",
+    "category": "hang",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.binary_search([1, 3, 5], 4)",
+    "expected": "-1",
+    "actual": {
+      "ok": false,
+      "exc": "Timeout"
+    },
+    "failing_hidden_tests": [
+      "test_chunk",
+      "test_chunk_exact",
+      "test_chunk_bad",
+      "test_flatten",
+      "test_dedupe_order",
+      "test_rotate",
+      "test_rotate_zero",
+      "test_rotate_wrap",
+      "test_rotate_empty",
+      "test_sliding_window",
+      "test_binary_search_found",
+      "test_binary_search_edges",
+      "test_binary_search_missing",
+      "test_merge_sorted",
+      "test_merge_sorted_stable",
+      "test_last_n",
+      "test_last_n_zero"
+    ],
+    "visible_tests": 67
+  },
+  {
+    "id": "seq-merge-tail",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "hard",
+    "expr": "seq.merge_sorted([1, 4, 6], [2, 3, 7, 8])",
+    "expected": "[1, 2, 3, 4, 6, 7, 8]",
+    "actual": {
+      "ok": true,
+      "repr": "[1, 2, 3, 4, 6]"
+    },
+    "failing_hidden_tests": [
+      "test_merge_sorted",
+      "test_merge_sorted_stable"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "seq-merge-or",
+    "kind": "bug",
+    "category": "operator",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "easy",
+    "expr": "seq.merge_sorted([1], [2, 3])",
+    "expected": "[1, 2, 3]",
+    "actual": {
+      "ok": false,
+      "exc": "IndexError"
+    },
+    "failing_hidden_tests": [
+      "test_merge_sorted",
+      "test_merge_sorted_stable"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "seq-last-n-zero",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "easy",
+    "expr": "seq.last_n([1, 2, 3], 0)",
+    "expected": "[]",
+    "actual": {
+      "ok": true,
+      "repr": "[1, 2, 3]"
+    },
+    "failing_hidden_tests": [
+      "test_last_n_zero"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-discount-formula",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "hard",
+    "expr": "money.apply_discount(80.0, 25)",
+    "expected": "60.0",
+    "actual": {
+      "ok": true,
+      "repr": "20.0"
+    },
+    "failing_hidden_tests": [
+      "test_discount",
+      "test_discount_full",
+      "test_invoice_total"
+    ],
+    "visible_tests": 81
+  },
+  {
+    "id": "money-discount-full",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "easy",
+    "expr": "money.apply_discount(50.0, 100)",
+    "expected": "0.0",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_discount_full"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-split-floor",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "easy",
+    "expr": "money.split_bill(100, 3)",
+    "expected": "33.33",
+    "actual": {
+      "ok": true,
+      "repr": "33.0"
+    },
+    "failing_hidden_tests": [
+      "test_split_bill_uneven"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-split-tip-percent",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "hard",
+    "expr": "money.split_bill(100, 4, tip_percent=20)",
+    "expected": "30.0",
+    "actual": {
+      "ok": true,
+      "repr": "525.0"
+    },
+    "failing_hidden_tests": [
+      "test_split_bill_tip"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-compound-rate",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "hard",
+    "expr": "money.compound_interest(1000, 0.12, 1, 12)",
+    "expected": "1126.83",
+    "actual": {
+      "ok": true,
+      "repr": "3895.98"
+    },
+    "failing_hidden_tests": [
+      "test_compound_monthly"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-compound-periods",
+    "kind": "bug",
+    "category": "arithmetic",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "hard",
+    "expr": "money.compound_interest(1000, 0.12, 1, 12)",
+    "expected": "1126.83",
+    "actual": {
+      "ok": true,
+      "repr": "1010.0"
+    },
+    "failing_hidden_tests": [
+      "test_compound_monthly"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-format-negative",
+    "kind": "bug",
+    "category": "format",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "hard",
+    "expr": "money.format_currency(-5)",
+    "expected": "'-$5.00'",
+    "actual": {
+      "ok": true,
+      "repr": "'-$-5.00'"
+    },
+    "failing_hidden_tests": [
+      "test_format_currency_negative"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-format-thousands",
+    "kind": "bug",
+    "category": "format",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "easy",
+    "expr": "money.format_currency(1234.5)",
+    "expected": "'$1,234.50'",
+    "actual": {
+      "ok": true,
+      "repr": "'$1234.50'"
+    },
+    "failing_hidden_tests": [
+      "test_format_currency"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "money-tax-zero",
+    "kind": "bug",
+    "category": "cross-module",
+    "file": "toolkit/money.py",
+    "component": "money",
+    "difficulty": "easy",
+    "expr": "report.invoice_total([(1, 100.0)], tax_rate=0)",
+    "expected": "100.0",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_tax_zero"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "dates-leap-and",
+    "kind": "bug",
+    "category": "operator",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "easy",
+    "expr": "dates.is_leap_year(2024)",
+    "expected": "True",
+    "actual": {
+      "ok": true,
+      "repr": "False"
+    },
+    "failing_hidden_tests": [
+      "test_day_of_year_leap",
+      "test_days_in_feb_leap",
+      "test_leap_years"
+    ],
+    "visible_tests": 81
+  },
+  {
+    "id": "dates-leap-400",
+    "kind": "bug",
+    "category": "operator",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "easy",
+    "expr": "dates.is_leap_year(2000)",
+    "expected": "True",
+    "actual": {
+      "ok": true,
+      "repr": "False"
+    },
+    "failing_hidden_tests": [
+      "test_leap_years"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "dates-november-days",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "hard",
+    "expr": "dates.days_in_month(2023, 11)",
+    "expected": "30",
+    "actual": {
+      "ok": true,
+      "repr": "31"
+    },
+    "failing_hidden_tests": [
+      "test_day_of_year_leap",
+      "test_days_in_month"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "dates-feb-swapped",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "hard",
+    "expr": "dates.days_in_month(2024, 2)",
+    "expected": "29",
+    "actual": {
+      "ok": true,
+      "repr": "28"
+    },
+    "failing_hidden_tests": [
+      "test_day_of_year",
+      "test_day_of_year_bad",
+      "test_day_of_year_leap",
+      "test_days_in_feb_leap",
+      "test_days_in_month"
+    ],
+    "visible_tests": 79
+  },
+  {
+    "id": "dates-quarter-formula",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "hard",
+    "expr": "dates.quarter_of(3)",
+    "expected": "1",
+    "actual": {
+      "ok": true,
+      "repr": "2"
+    },
+    "failing_hidden_tests": [
+      "test_quarter_of"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "dates-quarter-bound",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "easy",
+    "expr": "dates.quarter_of(12)",
+    "expected": "4",
+    "actual": {
+      "ok": false,
+      "exc": "ValueError"
+    },
+    "failing_hidden_tests": [
+      "test_quarter_of"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "dates-doy-range",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "hard",
+    "expr": "dates.day_of_year(2023, 3, 1)",
+    "expected": "60",
+    "actual": {
+      "ok": true,
+      "repr": "91"
+    },
+    "failing_hidden_tests": [
+      "test_day_of_year",
+      "test_day_of_year_leap"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "dates-doy-validation",
+    "kind": "bug",
+    "category": "edge-case",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "hard",
+    "expr": "dates.day_of_year(2023, 2, 29)",
+    "expected": "raise ValueError",
+    "actual": {
+      "ok": true,
+      "repr": "60"
+    },
+    "failing_hidden_tests": [
+      "test_day_of_year_bad"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "report-mean-rounding",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/report.py",
+    "component": "report",
+    "difficulty": "hard",
+    "expr": "report.summarize([1, 2, 3, 4])",
+    "expected": "{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}",
+    "actual": {
+      "ok": true,
+      "repr": "{'count': 4, 'mean': 2, 'median': 2.5, 'max': 4}"
+    },
+    "failing_hidden_tests": [
+      "test_summarize",
+      "test_summarize_unsorted"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "report-max-last",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/report.py",
+    "component": "report",
+    "difficulty": "hard",
+    "expr": "report.summarize([3, 9, 2])",
+    "expected": "{'count': 3, 'mean': 4.67, 'median': 3, 'max': 9}",
+    "actual": {
+      "ok": true,
+      "repr": "{'count': 3, 'mean': 4.67, 'median': 3, 'max': 2}"
+    },
+    "failing_hidden_tests": [
+      "test_summarize_unsorted"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "report-top-words-order",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/report.py",
+    "component": "report",
+    "difficulty": "easy",
+    "expr": "report.top_words('b a b c a b', 2)",
+    "expected": "['b', 'a']",
+    "actual": {
+      "ok": true,
+      "repr": "['c', 'a']"
+    },
+    "failing_hidden_tests": [
+      "test_top_words"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "report-top-words-slice",
+    "kind": "bug",
+    "category": "off-by-one",
+    "file": "toolkit/report.py",
+    "component": "report",
+    "difficulty": "hard",
+    "expr": "report.top_words('z y x', 2)",
+    "expected": "['x', 'y']",
+    "actual": {
+      "ok": true,
+      "repr": "['x']"
+    },
+    "failing_hidden_tests": [
+      "test_top_words",
+      "test_top_words_tie_alpha"
+    ],
+    "visible_tests": 82
+  },
+  {
+    "id": "report-invoice-tax-base",
+    "kind": "bug",
+    "category": "logic",
+    "file": "toolkit/report.py",
+    "component": "report",
+    "difficulty": "easy",
+    "expr": "report.invoice_total([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1)",
+    "expected": "24.75",
+    "actual": {
+      "ok": true,
+      "repr": "25.0"
+    },
+    "failing_hidden_tests": [
+      "test_invoice_total"
+    ],
+    "visible_tests": 83
+  },
+  {
+    "id": "invalid-median-lower",
+    "kind": "invalid",
+    "category": "invalid",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "n/a",
+    "expr": "stats.median([1, 2, 3, 4])",
+    "expected": "2",
+    "actual": {
+      "ok": true,
+      "repr": "2.5"
+    },
+    "failing_hidden_tests": [],
+    "visible_tests": 84
+  },
+  {
+    "id": "invalid-rotate-left",
+    "kind": "invalid",
+    "category": "invalid",
+    "file": "toolkit/seq.py",
+    "component": "seq",
+    "difficulty": "n/a",
+    "expr": "seq.rotate([1, 2, 3], 1)",
+    "expected": "[2, 3, 1]",
+    "actual": {
+      "ok": true,
+      "repr": "[3, 1, 2]"
+    },
+    "failing_hidden_tests": [],
+    "visible_tests": 84
+  },
+  {
+    "id": "invalid-leap-1900",
+    "kind": "invalid",
+    "category": "invalid",
+    "file": "toolkit/dates.py",
+    "component": "dates",
+    "difficulty": "n/a",
+    "expr": "dates.is_leap_year(1900)",
+    "expected": "True",
+    "actual": {
+      "ok": true,
+      "repr": "False"
+    },
+    "failing_hidden_tests": [],
+    "visible_tests": 84
+  },
+  {
+    "id": "invalid-percentile-interp",
+    "kind": "invalid",
+    "category": "invalid",
+    "file": "toolkit/stats.py",
+    "component": "stats",
+    "difficulty": "n/a",
+    "expr": "stats.percentile([1, 2, 3, 4], 50)",
+    "expected": "2.5",
+    "actual": {
+      "ok": true,
+      "repr": "2"
+    },
+    "failing_hidden_tests": [],
+    "visible_tests": 84
+  },
+  {
+    "id": "invalid-word-count-hyphen",
+    "kind": "invalid",
+    "category": "invalid",
+    "file": "toolkit/text.py",
+    "component": "text",
+    "difficulty": "n/a",
+    "expr": "text.word_count('state-of-the-art design')",
+    "expected": "5",
+    "actual": {
+      "ok": true,
+      "repr": "2"
+    },
+    "failing_hidden_tests": [],
+    "visible_tests": 84
+  }
+]

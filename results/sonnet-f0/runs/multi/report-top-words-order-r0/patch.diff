@@ -1,0 +1,64 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..06b7532
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..91deef1
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..6af41d8
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..f1ff1e0
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import report
++
++
++def test_top_words_most_common_first():
++    assert report.top_words('b a b c a b', 2) == ['b', 'a']
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..6d6a269
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..2f21c88
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..86c2672
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..f64ffb2
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..b2f8855
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..8ee41b6
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..9eb0832
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/report.py b/toolkit/report.py
+index 43265a8..e340a64 100644
+--- a/toolkit/report.py
++++ b/toolkit/report.py
+@@ -16,7 +16,7 @@ def top_words(s, n):
+     counts = {}
+     for w in words:
+         counts[w] = counts.get(w, 0) + 1
+-    ranked = sorted(counts, key=lambda w: (counts[w], w))
++    ranked = sorted(counts, key=lambda w: (-counts[w], w))
+     return ranked[:n]
+ 
+ 

@@ -1,0 +1,18 @@
+{
+  "id": "text-palindrome-case",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.is_palindrome('Racecar')",
+  "expected": "True",
+  "actual": {
+    "ok": true,
+    "repr": "False"
+  },
+  "failing_hidden_tests": [
+    "test_palindrome_true"
+  ],
+  "visible_tests": 83
+}

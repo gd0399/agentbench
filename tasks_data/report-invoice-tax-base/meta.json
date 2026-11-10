@@ -1,0 +1,18 @@
+{
+  "id": "report-invoice-tax-base",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/report.py",
+  "component": "report",
+  "difficulty": "easy",
+  "expr": "report.invoice_total([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1)",
+  "expected": "24.75",
+  "actual": {
+    "ok": true,
+    "repr": "25.0"
+  },
+  "failing_hidden_tests": [
+    "test_invoice_total"
+  ],
+  "visible_tests": 83
+}

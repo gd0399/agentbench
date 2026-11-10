@@ -1,0 +1,7 @@
+{
+  "number": 158,
+  "title": "summarize() max is wrong for unsorted input",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`report.summarize([3, 9, 2])` returns `{'count': 3, 'mean': 4.67, 'median': 3, 'max': 2}`. Expected: `{'count': 3, 'mean': 4.67, 'median': 3, 'max': 9}`.\n\nThanks for the great library!",
+  "author": "jchen42",
+  "labels": []
+}

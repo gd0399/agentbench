@@ -1,0 +1,18 @@
+{
+  "id": "seq-rotate-empty",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.rotate([], 3)",
+  "expected": "[]",
+  "actual": {
+    "ok": false,
+    "exc": "ZeroDivisionError"
+  },
+  "failing_hidden_tests": [
+    "test_rotate_empty"
+  ],
+  "visible_tests": 83
+}

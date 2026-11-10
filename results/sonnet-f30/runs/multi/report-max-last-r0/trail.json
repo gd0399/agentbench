@@ -1,0 +1,77 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  },
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "report",
+  "summary": "summarize() max is wrong for unsorted input"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 10, in summarize(): \"max\": values[-1] returns the last element, assuming sorted input, rather than max(values). It is only right for ascending input, which is why the existing test with [1,2,3,4] passes. The fix is to use max(values). Mean and median are correct.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_summarize_max_unsorted __________________________\n\n    def test_summarize_max_unsorted():\n>       assert report.summarize([3, 9, 2]) == {'count': 3, 'mean': 4.67, 'median': 3, 'max': 9}\nE       AssertionError: assert {'count': 3, ...: 3, 'max': 2} == {'count': 3, ...: 3, 'max': 9}\nE         \nE         Omitting 3 identical items, use -vv to show\nE         Differing items:\nE         {'max': 2} != {'max': 9}\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_summarize_max_unsorted - AssertionErro...\n1 failed in 0.25s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct. It addresses the root cause, which was that `values[-1]` assumed sorted input, and replaces it with `max(values)`. It is a one-line change. I ran the full suite and 84 tests pass. I also checked unsorted, single-element and all-negative input, and all give the right max. Empty input still raises ValueError from `mean`, as it did before. The new regression test in tests/test_issue_repro.py matches the issue, and no existing tests were changed.\n\nOne nit: the diff includes committed `__pycache__/*.pyc` files. Please drop them from the commit and consider adding a `.gitignore`. They are build artifacts, not part of the change, so I'm approving anyway.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

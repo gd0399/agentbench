@@ -1,0 +1,18 @@
+{
+  "id": "seq-bsearch-loop-cond",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "easy",
+  "expr": "seq.binary_search([1, 3, 5, 7, 9], 9)",
+  "expected": "4",
+  "actual": {
+    "ok": true,
+    "repr": "-1"
+  },
+  "failing_hidden_tests": [
+    "test_binary_search_edges"
+  ],
+  "visible_tests": 83
+}

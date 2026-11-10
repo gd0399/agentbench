@@ -1,0 +1,76 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause and no conflicting tests. The next step is a fix.",
+   "instructions": "Fix flatten() in toolkit/seq.py (lines ~10-17) so it flattens recursively. Replace `out.extend(item)` with `out.extend(flatten(item))` for list/tuple items, or use an explicit stack. The stack avoids recursion limits on deep nesting. Keep the existing handling of list/tuple types. Do not flatten strings or bytes. Return a list. Add a short docstring that says it flattens recursively. Move the repro test into tests/test_toolkit.py as a regression test (`flatten([1, [2, [3]]]) == [1, 2, 3]`). Add a few extra cases: empty nested lists, tuples, mixed depth, and strings left intact. Run the full test suite and report the diff and the results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "escalate",
+   "reason": "coder and generalist both failed",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "coder",
+   "error": "ModelUnavailable: all models failed for coder: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "all models failed for supervisor: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_01",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  },
+  {
+   "agent": "generalist",
+   "error": "ModelUnavailable: all models failed for generalist: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 're",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: FAILED -> generalist",
+  "generalist: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.flatten only flattens one level of nesting: flatten([1, [2, [3]]]) returns [1, 2, [3]] instead of the expected [1, 2, 3]. It should flatten recursively. Reported against production use. Fix is likely in toolkit/seq.py, with a regression test for deeply nested input added to tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py, flatten() lines 10-17: for list/tuple items it calls `out.extend(item)` which adds the sub-items without recursing, so only one level is flattened. Nested lists inside `item` stay intact. The fix is to recurse (e.g. `out.extend(flatten(item))`) or use an explicit stack. flatten has no docstring and no existing tests, so nothing documents one-level behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________ test_flatten_deeply_nested __________________________\n\n    def test_flatten_deeply_nested():\n>       assert seq.flatten([1, [2, [3]]]) == [1, 2, 3]\nE       assert [1, 2, [3]] == [1, 2, 3]\nE         \nE         At index 2 diff: [3] != 3\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_flatten_deeply_nested - assert [1, 2, ...\n1 failed in 0.02s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

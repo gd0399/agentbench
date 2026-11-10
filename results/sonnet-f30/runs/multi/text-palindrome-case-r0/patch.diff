@@ -1,0 +1,41 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index d816b31..a1749c6 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -103,6 +103,15 @@ def test_word_count_empty():
+ def test_palindrome_false():
+     assert not text.is_palindrome('hello')
+ 
++def test_palindrome_case_insensitive():
++    assert text.is_palindrome('Racecar') is True
++
++def test_palindrome_mixed_case_with_punctuation():
++    assert text.is_palindrome('A man, a plan, a canal: Panama') is True
++
++def test_palindrome_casefold_expansion():
++    assert text.is_palindrome('ßss') is True
++
+ def test_title_case():
+     assert text.title_case('the lord of the rings') == 'The Lord of the Rings'
+ 
+diff --git a/toolkit/text.py b/toolkit/text.py
+index aa19ec1..e4cab79 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -21,7 +21,7 @@ def word_count(s):
+ 
+ 
+ def is_palindrome(s):
+-    cleaned = [c for c in s if c.isalnum()]
++    cleaned = "".join(c for c in s if c.isalnum()).casefold()
+     return cleaned == cleaned[::-1]
+ 
+ 

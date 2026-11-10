@@ -1,0 +1,84 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..7200e45
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..e649c17
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..7ad35a3
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..d057f52
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import money
++
++
++def test_apply_discount_returns_price():
++    assert money.apply_discount(80.0, 25) == 60.0
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index b5d05fb..f508757 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -183,6 +183,15 @@ def test_discount_bounds():
+     with pytest.raises(ValueError):
+         money.apply_discount(10, 120)
+ 
++def test_discount_returns_discounted_price():
++    assert money.apply_discount(80.0, 25) == 60.0
++
++def test_discount_zero_percent():
++    assert money.apply_discount(80.0, 0) == 80.0
++
++def test_discount_full_percent():
++    assert money.apply_discount(80.0, 100) == 0.0
++
+ def test_split_bill():
+     assert money.split_bill(100, 4) == 25.0
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..683316e
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..6054bba
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..62991e0
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..bec7ce1
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..5d68f74
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..16b9bc4
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..a5f47bb
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/money.py b/toolkit/money.py
+index 92c2c12..1abae89 100644
+--- a/toolkit/money.py
++++ b/toolkit/money.py
+@@ -4,7 +4,7 @@
+ def apply_discount(price, percent):
+     if percent < 0 or percent > 100:
+         raise ValueError("percent must be between 0 and 100")
+-    return round(price * percent / 100, 2)
++    return round(price - price * percent / 100, 2)
+ 
+ 
+ def split_bill(total, people, tip_percent=0):

@@ -1,0 +1,218 @@
+{
+  "config": {
+    "tasks_dir": "tasks_data",
+    "out": "results/run",
+    "systems": [
+      "single",
+      "multi"
+    ],
+    "backend": "offline",
+    "model": "anthropic:claude-sonnet-5-5",
+    "fallback_models": [],
+    "router": "rules",
+    "limit": 10,
+    "only": null,
+    "repeats": 1,
+    "workers": 4,
+    "fault_rate": 0.0,
+    "seed": 0,
+    "budget_usd": 1.0,
+    "max_coder_attempts": 3,
+    "max_agent_steps": 25,
+    "max_single_steps": 60
+  },
+  "n_rows": 20,
+  "n_tasks": 10,
+  "systems": {
+    "single": {
+      "n": 10,
+      "successes": 6,
+      "success_rate": 0.6,
+      "success_ci95": [
+        0.3126695474501864,
+        0.8318224187964902
+      ],
+      "false_positive_pr_rate": 0.1,
+      "cost_per_task_mean": 0.0,
+      "cost_per_task_median": 0.0,
+      "cost_per_success": 0.0,
+      "total_cost": 0.0,
+      "latency_mean_s": 2.6838,
+      "latency_p50_s": 2.0195,
+      "latency_p95_s": 5.148149999999999,
+      "llm_calls_mean": 1.0,
+      "input_tokens_mean": 0.0,
+      "output_tokens_mean": 0.0,
+      "handoffs_mean": 0.0,
+      "injected_failures": 0,
+      "recovered_errors": 0,
+      "localization_acc": 1.0,
+      "triage_acc": null,
+      "statuses": {
+        "pr_opened": 6,
+        "invalid": 4
+      }
+    },
+    "multi": {
+      "n": 10,
+      "successes": 6,
+      "success_rate": 0.6,
+      "success_ci95": [
+        0.3126695474501864,
+        0.8318224187964902
+      ],
+      "false_positive_pr_rate": 0.1,
+      "cost_per_task_mean": 0.0,
+      "cost_per_task_median": 0.0,
+      "cost_per_success": 0.0,
+      "total_cost": 0.0,
+      "latency_mean_s": 2.4648,
+      "latency_p50_s": 1.9500000000000002,
+      "latency_p95_s": 4.146249999999998,
+      "llm_calls_mean": 4.1,
+      "input_tokens_mean": 0.0,
+      "output_tokens_mean": 0.0,
+      "handoffs_mean": 5.1,
+      "injected_failures": 0,
+      "recovered_errors": 0,
+      "localization_acc": 1.0,
+      "triage_acc": 0.9,
+      "statuses": {
+        "pr_opened": 6,
+        "invalid": 4
+      }
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "single": {
+        "n": 4,
+        "success_rate": 0.75
+      },
+      "multi": {
+        "n": 4,
+        "success_rate": 0.75
+      }
+    },
+    "hard": {
+      "multi": {
+        "n": 5,
+        "success_rate": 0.4
+      },
+      "single": {
+        "n": 5,
+        "success_rate": 0.4
+      }
+    },
+    "n/a": {
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    }
+  },
+  "by_category": {
+    "arithmetic": {
+      "single": {
+        "n": 4,
+        "success_rate": 0.5
+      },
+      "multi": {
+        "n": 4,
+        "success_rate": 0.5
+      }
+    },
+    "cross-module": {
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    },
+    "edge-case": {
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    },
+    "invalid": {
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    },
+    "logic": {
+      "multi": {
+        "n": 2,
+        "success_rate": 0.5
+      },
+      "single": {
+        "n": 2,
+        "success_rate": 0.5
+      }
+    },
+    "operator": {
+      "single": {
+        "n": 1,
+        "success_rate": 0.0
+      },
+      "multi": {
+        "n": 1,
+        "success_rate": 0.0
+      }
+    }
+  },
+  "by_kind": {
+    "bug": {
+      "multi": {
+        "n": 9,
+        "success_rate": 0.5555555555555556
+      },
+      "single": {
+        "n": 9,
+        "success_rate": 0.5555555555555556
+      }
+    },
+    "invalid": {
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    }
+  },
+  "paired": {
+    "pairs": 10,
+    "single_only": 0,
+    "multi_only": 0,
+    "both": 6,
+    "neither": 4,
+    "success_diff": 0.0,
+    "success_diff_ci95": [
+      0.0,
+      0.0
+    ],
+    "mcnemar_p": 1.0,
+    "cost_ratio": null,
+    "latency_ratio_p50": 0.9655855409754891
+  },
+  "harness_errors": []
+}

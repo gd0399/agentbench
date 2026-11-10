@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause and a failing repro test, and it doesn't conflict with existing tests. The next step is the fix.",
+   "instructions": "In toolkit/dates.py, function is_leap_year (around line 5), change the condition from `year % 4 == 0 and (year % 100 != 0 or year % 400 != 0)` to `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. Keep the change minimal. Then run tests/test_issue_repro.py and the full test suite. Both repro tests should pass: 2000 is a leap year and 1900 is not. Also check that days_in_month and day_of_year give correct results for 1900 and 2000. Don't edit the repro tests unless they are wrong. Report the diff and the test output."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "dates.is_leap_year(2000) returns False but should return True. Years divisible by 400 are leap years even though they are divisible by 100. The Gregorian rule is likely implemented incorrectly in toolkit/dates.py, probably by excluding all century years without the 400 exception."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 5, is_leap_year: the condition is `year % 4 == 0 and (year % 100 != 0 or year % 400 != 0)`. The last clause should be `year % 400 == 0`. As written, 2000 returns False. 1900 also wrongly returns True, and so does every century year not divisible by 400. This also makes days_in_month and day_of_year wrong for those years.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n______________________________ test_2000_is_leap _______________________________\n\n    def test_2000_is_leap():\n>       assert dates.is_leap_year(2000) is True\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7f62a4c92660>(2000)\nE        +    where <function is_leap_year at 0x7f62a4c92660> = dates.is_leap_year\n\ntests/test_issue_repro.py:5: AssertionError\n_______________________________ test_other_years _______________________________\n\n    def test_other_years():\n>       assert dates.is_leap_year(1900) is False\nE       assert True is False\nE        +  where True = <function is_leap_year at 0x7f62a4c92660>(1900)\nE        +    where <function is_leap_year at 0x7f62a4c92660> = dates.is_leap_year\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_2000_is_leap - assert False is True\nFAILED tests/test_issue_repro.py::test_other_years - assert True is False\n2 failed in 0.27s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. It changes `year % 400 != 0` to `year % 400 == 0` in `is_leap_year`, which was the root cause. I checked it against `calendar.isleap` for years 1 to 4999 and every year matches. `days_in_month` and `day_of_year` get the right answers through it. The full suite passes (85 tests). The new tests in `tests/test_issue_repro.py` cover 2000, 1900, 2024 and 2023, and no existing tests were changed.\n\nBefore merging, drop the committed `__pycache__/*.pyc` files from the diff, and add `__pycache__/` to `.gitignore` if it isn't there already. They are build artifacts and don't belong in the patch. This doesn't affect the code change itself.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

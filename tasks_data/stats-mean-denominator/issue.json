@@ -1,0 +1,7 @@
+{
+  "number": 101,
+  "title": "mean() gives the wrong average",
+  "body": "### What happened?\n`stats.mean([1, 2, 3, 4])` returns `3.3333333333333335`.\n\n### What did you expect?\nIt should return `2.5` (expected: `2.5`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

@@ -1,0 +1,76 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a failing test and the root cause is identified (toolkit/money.py line 27 formats signed amount instead of abs(amount)). It doesn't conflict with existing tests, so a fix can be written.",
+   "instructions": "In toolkit/money.py, format_currency (around line 27): the sign is already computed and prefixed (sign = \"-\" if amount < 0), but the f-string formats `amount`. Change it to format `abs(amount)`, e.g. f\"{sign}${abs(amount):,.2f}\". Keep positive and zero behavior unchanged. Make sure tests/test_issue_repro.py::test_negative_currency passes and move or keep it as a regression test for negative amounts, for example in the existing money tests. Run the full test suite to confirm there are no regressions. Keep the diff minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "open_pr",
+   "reason": "generalist fixed the issue and checks pass",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "coder",
+   "error": "InjectedFailure: injected failure in coder (call 2)",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 3)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: FAILED -> generalist",
+  "generalist: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "money",
+  "summary": "money.format_currency(-5) returns '-$-5.00' instead of '-$5.00'. The minus sign is applied twice for negative amounts, likely because the sign is prefixed and the signed value is also formatted. The fix is to format the absolute value after emitting the sign. Add a regression test for negative amounts."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py"
+  ],
+  "root_cause": "format_currency prefixed a sign and also formatted the signed amount, producing two minus signs.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________________ test_negative_currency ____________________________\n\n    def test_negative_currency():\n>       assert money.format_currency(-5) == '-$5.00'\nE       AssertionError: assert '-$-5.00' == '-$5.00'\nE         \nE         - -$5.00\nE         + -$-5.00\nE         ?   +\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_negative_currency - AssertionError: as...\n1 failed in 0.26s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

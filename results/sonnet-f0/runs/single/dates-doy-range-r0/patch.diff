@@ -1,0 +1,65 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..d9a24a8
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..b7a1c1c
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..c077ce4
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..d59c17a
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,7 @@
++from toolkit import dates
++
++
++def test_day_of_year():
++    assert dates.day_of_year(2023, 3, 1) == 60
++    assert dates.day_of_year(2023, 1, 1) == 1
++    assert dates.day_of_year(2024, 12, 31) == 366
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..4aee550
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..c8cbd77
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..5dce5c5
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..bc18d7a
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..ef4b214
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..f76d81a
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..e208142
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/dates.py b/toolkit/dates.py
+index 5fc2692..a288e2f 100644
+--- a/toolkit/dates.py
++++ b/toolkit/dates.py
+@@ -25,6 +25,6 @@ def day_of_year(year, month, day):
+     if day < 1 or day > days_in_month(year, month):
+         raise ValueError("invalid day")
+     total = 0
+-    for m in range(1, month + 1):
++    for m in range(1, month):
+         total += days_in_month(year, m)
+     return total + day

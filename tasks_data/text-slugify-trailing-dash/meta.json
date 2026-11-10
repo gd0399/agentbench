@@ -1,0 +1,18 @@
+{
+  "id": "text-slugify-trailing-dash",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.slugify('  Hello, World! ')",
+  "expected": "'hello-world'",
+  "actual": {
+    "ok": true,
+    "repr": "'hello-world-'"
+  },
+  "failing_hidden_tests": [
+    "test_slugify"
+  ],
+  "visible_tests": 83
+}

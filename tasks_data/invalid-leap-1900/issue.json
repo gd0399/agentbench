@@ -1,0 +1,7 @@
+{
+  "number": 164,
+  "title": "1900 should be a leap year",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`dates.is_leap_year(1900)` returns `False`. 1900 is divisible by 4.\n\nExpected: `True`.\n\nThanks for the great library!",
+  "author": "octocat",
+  "labels": []
+}

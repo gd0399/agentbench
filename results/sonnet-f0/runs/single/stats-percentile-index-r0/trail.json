@@ -1,0 +1,25 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "percentile() computed the nearest rank ceil(p*n/100), which is 1-based, but used it directly as a 0-based list index. This returned the next element, and p=100 would raise IndexError.",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

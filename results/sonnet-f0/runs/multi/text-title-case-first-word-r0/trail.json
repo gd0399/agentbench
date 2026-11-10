@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause. No patch exists yet, so the next step is a fix.",
+   "instructions": "In toolkit/text.py, title_case (around lines 31-35), change the condition `if w.lower() in minor:` to `if i > 0 and w.lower() in minor:`. This makes the first word always capitalized. Add a regression test to tests/test_toolkit.py: `assert text.title_case('the lord of the rings') == 'The Lord of the Rings'`. The existing repro test is tests/test_issue_repro.py. Keep the change minimal. Run the full test suite, including test_title_case_mixed ('hELLO wORLD'), and confirm it passes. toolkit/report.py:30 also calls title_case, so check that no report tests depend on a lowercase leading minor word. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.title_case('the lord of the rings') returns 'the Lord of the Rings' instead of 'The Lord of the Rings'. The first word is lowercased because it is treated like a minor word (e.g. 'the', 'of'). The first word should always be capitalized, even when it is a minor word. The fix belongs in toolkit/text.py, with a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/text.py title_case (lines 31-35): the loop enumerates `i` but never uses it. Line 32 `if w.lower() in minor:` lowercases any minor word, including the first word at i == 0. The fix is to change the condition to `if i > 0 and w.lower() in minor:`. The existing test test_title_case_mixed ('hELLO wORLD') is unaffected. Caller toolkit/report.py:30 also uses title_case, so its output changes the same way for titles that start with a minor word. No conflict with docs or tests.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________ test_title_case_first_word_capitalized ____________________\n\n    def test_title_case_first_word_capitalized():\n>       assert text.title_case('the lord of the rings') == 'The Lord of the Rings'\nE       AssertionError: assert 'the Lord of the Rings' == 'The Lord of the Rings'\nE         \nE         - The Lord of the Rings\nE         ? ^\nE         + the Lord of the Rings\nE         ? ^\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_title_case_first_word_capitalized - As...\n1 failed in 0.19s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The change `if i > 0 and w.lower() in minor` fixes the root cause: the first word is now always capitalized, and minor words in later positions are still lowercased. It isn't special-cased to the issue's input. The only caller outside the tests is report.py, which passes the result to truncate, so its behaviour only changes when a title starts with a minor word. That is the intended fix. The full suite passes (83 tests), and no existing tests were modified or removed.\n\nNits to clean up before merging:\n- The diff includes __pycache__/*.pyc files. They look like artifacts of running the tests, but please don't commit them. Adding a .gitignore would help.\n- tests/test_issue_repro.py and test_title_case_first_word_minor in tests/test_toolkit.py assert the same thing. Keep only the one in test_toolkit.py.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

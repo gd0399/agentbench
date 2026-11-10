@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: the guard `if n < 2 or sample:` in toolkit/stats.py variance() is wrong. No patch exists yet, so the coder should write the fix.",
+   "instructions": "Fix variance() in toolkit/stats.py (around lines 37-39). Replace the guard `if n < 2 or sample:` with `if sample and n < 2:`. Also handle empty input explicitly: check `n == 0` first and raise ValueError, so that check is no longer unreachable. With that, sample=False must work for n>=1, and variance([5], sample=False) must return 0.0. Keep the existing error behavior: variance([1]) with the default sample=True must still raise. The result for variance([1,2,3]) must be 1.0. Keep the repro tests in tests/test_issue_repro.py (test_sample_variance_valid_input and test_population_variance_single_value). Add a regression test to tests/test_toolkit.py for variance([1,2,3]) == 1.0. Then run the full test suite and report the results. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.variance([1, 2, 3]) raises ValueError on valid input; expected the sample variance, 1.0. The likely cause is an overly strict input validation check in toolkit/stats.py, such as a wrong minimum-length condition. Needs investigation of variance() in toolkit/stats.py and a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 37, in variance(): the guard `if n < 2 or sample:` is wrong. It raises whenever sample=True (the default), whatever the length, so variance([1,2,3]) always raises. It should be `if sample and n < 2:`. The empty-input check on line 39 (`n == 0`) is unreachable because `n < 2` catches it first. With the intended guard, sample=False works for n>=1, and the empty case needs to be checked first or handled. Existing tests are consistent with the fix: test_variance_population uses sample=False, and test_variance_too_small expects variance([1]) to raise under the default sample=True. The issue's expected value is right: the sample variance of [1,2,3] is 1.0. Repro at tests/test_issue_repro.py. test_sample_variance_valid_input is the issue's own case. test_population_variance_single_value is an extra check I added, which also fails today.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_______________________ test_sample_variance_valid_input _______________________\n\n    def test_sample_variance_valid_input():\n>       assert stats.variance([1, 2, 3]) == 1.0\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:5: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [1, 2, 3], sample = True\n\n    def variance(values, sample=True):\n        n = len(values)\n        if n < 2 or sample:\n>           raise ValueError(\"sample variance needs at least two values\")\nE           ValueError: sample variance needs at least two values\n\ntoolkit/stats.py:38: ValueError\n____________________ test_population_variance_single_value _____________________\n\n    def test_population_variance_single_value():\n>       assert stats.variance([5], sample=False) == 0.0\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:9: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [5], sample = False\n\n    def variance(values, sample=True):\n        n = len(values)\n        if n < 2 or sample:\n>           raise ValueError(\"sample variance needs at least two values\")\nE           ValueError: sample variance needs at least two values\n\ntoolkit/stats.py:38: ValueError\n=========================== short test sum"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "I'd merge this. The root cause was the guard `if n < 2 or sample`, which raised for every sample=True call. The new guard is `sample and n < 2`, and the empty-input check now runs first. I ran these cases:\n- variance([1,2,3]) returns 1.0.\n- variance([5], sample=False) returns 0.0.\n- The population variance case returns 4.0.\n- [] raises the \"empty\" error with either sample setting.\n- [1] with sample=True raises the \"at least two values\" error.\n\nAll 86 tests pass. The existing test_variance_too_small is unchanged, so no tests were weakened.\n\nNits, not blocking:\n- The diff includes committed __pycache__/*.pyc files. Drop them from the commit and add them to .gitignore.\n- tests/test_issue_repro.py duplicates the regression test the coder added to test_toolkit.py. Keep only one. The population single-value case in it is worth moving into test_toolkit.py.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

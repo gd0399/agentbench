@@ -1,0 +1,18 @@
+{
+  "id": "stats-moving-average-zero",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "easy",
+  "expr": "stats.moving_average([1, 2], 0)",
+  "expected": "raise ValueError",
+  "actual": {
+    "ok": false,
+    "exc": "ZeroDivisionError"
+  },
+  "failing_hidden_tests": [
+    "test_moving_average_bad"
+  ],
+  "visible_tests": 83
+}

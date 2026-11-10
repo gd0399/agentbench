@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: `mid = n / 2` in toolkit/stats.py line 15 should be `mid = n // 2`. No conflicts with existing tests. No patch exists yet, so the coder is next.",
+   "instructions": "In toolkit/stats.py, median(), change line 15 from `mid = n / 2` to `mid = n // 2`. Check that the odd branch (`ordered[mid]`) and the even branch (`(ordered[mid - 1] + ordered[mid]) / 2`) both return correct values. Keep the change minimal. Keep the existing empty-input ValueError behaviour. Keep the regression tests in tests/test_issue_repro.py (test_median_odd: median([3,1,2]) == 2, test_median_even: median([4,1,3,2]) == 2.5). Run the full test suite and report the results along with the diff."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "stats.median([3, 1, 2]) raises TypeError instead of returning 2. Reported in production use. The bug is likely in toolkit/stats.py, in how median handles its input (for example sorting, indexing or averaging). It needs reproducing and a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 15 in median(): `mid = n / 2` uses true division and yields a float. That float is then used as a list index at line 17 (`ordered[mid]`) for odd n and at line 18 (`ordered[mid - 1]`, `ordered[mid]`) for even n. This raises TypeError for every non-empty input, not just odd lengths. The fix is `mid = n // 2`. Nothing in the docs or tests conflicts with the expected behaviour, since the only existing median test covers the empty case.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_______________________________ test_median_odd ________________________________\n\n    def test_median_odd():\n>       assert stats.median([3, 1, 2]) == 2\n               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:5: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [3, 1, 2]\n\n    def median(values):\n        if not values:\n            raise ValueError(\"median() of empty sequence\")\n        ordered = sorted(values)\n        n = len(ordered)\n        mid = n / 2\n        if n % 2 == 1:\n>           return ordered[mid]\n                   ^^^^^^^^^^^^\nE           TypeError: list indices must be integers or slices, not float\n\ntoolkit/stats.py:17: TypeError\n_______________________________ test_median_even _______________________________\n\n    def test_median_even():\n>       assert stats.median([4, 1, 3, 2]) == 2.5\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:9: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [4, 1, 3, 2]\n\n    def median(values):\n        if not values:\n            raise ValueError(\"median() of empty sequence\")\n        ordered = sorted(values)\n        n = len(ordered)\n        mid = n / 2\n        if n % 2 == 1:\n            return ordered[mid]\n>       return (ordered[mid - 1] +"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was `mid = n / 2`, which gives a float in Python 3 and so raises TypeError when used as a list index. Changing it to `n // 2` fixes that directly. It is a one-line change and not specific to the issue's input.\n\nI ran the full suite: 82 passed. I also probed edge cases:\n- single element: `median([5]) == 5`\n- two elements: `median([1, 2]) == 1.5`\n- tuple input: `median((3, 1, 2)) == 2`\n- float input: `median([1.5, 2.5]) == 2.0`\n- empty input still raises ValueError\n\nThe coder did not modify existing tests. They added `tests/test_issue_repro.py` with odd-length and even-length regression cases, which is appropriate.\n\nMinor point: the diff includes `__pycache__/*.pyc` files. These are build artifacts and should not be committed. Make sure they are excluded or covered by .gitignore before merging. This does not affect the correctness of the fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced and the root cause is identified: the values are swapped in toolkit/dates.py line 12. A coder can write the fix.",
+   "instructions": "In toolkit/dates.py, days_in_month (around line 12), change `return 28 if is_leap_year(year) else 29` to `return 29 if is_leap_year(year) else 28`. Leave is_leap_year unchanged. Run tests/test_issue_repro.py and the full test suite, including day_of_year tests, to confirm nothing else breaks. Also check that non-leap Februaries (e.g. 2023) return 28. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "dates.days_in_month(2024, 2) returns 28 instead of 29. February length for leap years appears swapped or the leap-year check is wrong in toolkit/dates.py. Expected 29 for leap year 2024 (and 28 for non-leap years)."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 12, in days_in_month: `return 28 if is_leap_year(year) else 29` has the values swapped. It should be `return 29 if is_leap_year(year) else 28`. is_leap_year is correct and its test passes. day_of_year also uses days_in_month, so it inherits the error.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_feb_lengths _______________________________\n\n    def test_feb_lengths():\n>       assert dates.days_in_month(2024, 2) == 29\nE       assert 28 == 29\nE        +  where 28 = <function days_in_month at 0x7f3b01c6a700>(2024, 2)\nE        +    where <function days_in_month at 0x7f3b01c6a700> = dates.days_in_month\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_feb_lengths - assert 28 == 29\n1 failed in 0.19s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The bug was an inverted conditional in `days_in_month`. The patch swaps the two branches, so leap years return 29 and other years return 28. `is_leap_year` is correct, and `day_of_year` picks up the fix through `days_in_month`. All 80 tests pass. The new regression test covers 2024, 2023, 1900 and 2000, so it exercises the century rule as well as the plain leap-year case. No existing tests were modified.\n\nBefore merging, drop the `__pycache__/*.pyc` files from the diff. They are build artifacts, not part of the change. They are a leftover of running the tests. A `.gitignore` entry for `__pycache__/` would stop this happening again.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

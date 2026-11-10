@@ -1,0 +1,93 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..138cff2
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_day_of_year.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_day_of_year.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..42fe6b4
+Binary files /dev/null and b/tests/__pycache__/test_day_of_year.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..68f1aa9
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..c499aef
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_day_of_year.py b/tests/test_day_of_year.py
+new file mode 100644
+index 0000000..b0b5316
+--- /dev/null
++++ b/tests/test_day_of_year.py
+@@ -0,0 +1,14 @@
++from toolkit import dates
++
++
++def test_leap_year_values():
++    assert dates.day_of_year(2024, 3, 1) == 61
++    assert dates.day_of_year(2024, 12, 31) == 366
++
++
++def test_non_leap_year_end():
++    assert dates.day_of_year(2023, 12, 31) == 365
++
++
++def test_first_day():
++    assert dates.day_of_year(2023, 1, 1) == 1
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..d709576
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,11 @@
++from toolkit import dates
++
++
++def test_day_of_year_march_1():
++    assert dates.day_of_year(2023, 3, 1) == 60
++
++
++def test_day_of_year_jan_1_and_leap():
++    assert dates.day_of_year(2023, 1, 1) == 1
++    assert dates.day_of_year(2024, 3, 1) == 61
++    assert dates.day_of_year(2023, 12, 31) == 365
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..f02bfc6
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..332e14d
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..77be9fb
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..72b597c
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..d61c355
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..dcc7dff
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..857c58f
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/dates.py b/toolkit/dates.py
+index 5fc2692..a288e2f 100644
+--- a/toolkit/dates.py
++++ b/toolkit/dates.py
+@@ -25,6 +25,6 @@ def day_of_year(year, month, day):
+     if day < 1 or day > days_in_month(year, month):
+         raise ValueError("invalid day")
+     total = 0
+-    for m in range(1, month + 1):
++    for m in range(1, month):
+         total += days_in_month(year, m)
+     return total + day

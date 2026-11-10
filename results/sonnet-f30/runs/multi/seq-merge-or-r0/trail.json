@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: the loop condition in merge_sorted at toolkit/seq.py line 62 uses `or` where it should use `and`. No conflicts with existing tests. A patch is the next step.",
+   "instructions": "In toolkit/seq.py, merge_sorted (around line 62), change `while i < len(a) or j < len(b):` to `while i < len(a) and j < len(b):`. Keep the trailing `out.extend(a[i:])` and `out.extend(b[j:])` so leftovers are still appended. Make no other behaviour changes. Keep the regression tests in tests/test_issue_repro.py (unequal, empty and equal-length inputs), and move them into the proper test module if there is one. Run the full test suite and confirm that all 5 repro cases pass and nothing else breaks. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.merge_sorted([1], [2, 3]) raises IndexError instead of returning [1, 2, 3]. Likely an index/bounds bug in the merge loop when the inputs have different lengths, for example when one list is exhausted before the other. Fix in toolkit/seq.py and add a regression test for unequal-length and empty inputs."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py line 62, merge_sorted: the loop condition is `while i < len(a) or j < len(b)`. It should be `and`. With `or`, the body still runs after one list is exhausted and indexes a[i] or b[j] out of range, which raises IndexError. Even equal-length inputs like [1,3],[2,4] fail, because one list runs out first. Changing the condition to `and` fixes it, since the trailing `out.extend(a[i:])` and `out.extend(b[j:])` already handle the leftovers. The repro test, tests/test_issue_repro.py, covers unequal, empty and equal-length inputs. All 5 cases fail on the current code. The existing tests do not cover merge_sorted, so nothing contradicts the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=5 errors=0\nFFFFF                                                                    [100%]\n=================================== FAILURES ===================================\n________________________ test_merge_sorted[a0-b0-exp0] _________________________\n\na = [1], b = [2, 3], exp = [1, 2, 3]\n\n    @pytest.mark.parametrize(\"a,b,exp\", [\n        ([1], [2, 3], [1, 2, 3]),\n        ([2, 3], [1], [1, 2, 3]),\n        ([], [1, 2], [1, 2]),\n        ([1, 2], [], [1, 2]),\n        ([1, 3], [2, 4], [1, 2, 3, 4]),\n    ])\n    def test_merge_sorted(a, b, exp):\n>       assert seq.merge_sorted(a, b) == exp\n               ^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:13: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\na = [1], b = [2, 3]\n\n    def merge_sorted(a, b):\n        i = j = 0\n        out = []\n        while i < len(a) or j < len(b):\n>           if a[i] <= b[j]:\n               ^^^^\nE           IndexError: list index out of range\n\ntoolkit/seq.py:63: IndexError\n________________________ test_merge_sorted[a1-b1-exp1] _________________________\n\na = [2, 3], b = [1], exp = [1, 2, 3]\n\n    @pytest.mark.parametrize(\"a,b,exp\", [\n        ([1], [2, 3], [1, 2, 3]),\n        ([2, 3], [1], [1, 2, 3]),\n        ([], [1, 2], [1, 2]),\n        ([1, 2], [], [1, 2]),\n        ([1, 3], [2, 4], [1, 2, 3, 4]),\n    ])\n    def test_merge_sorted(a, b, exp):\n>       assert seq.merge_sorted(a, b) == exp\n               ^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:13:"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. It changes `or` to `and` in the `merge_sorted` loop. The old condition indexed `a[i]` or `b[j]` after one list was exhausted, which caused the IndexError. The existing `out.extend(a[i:])` and `out.extend(b[j:])` already append the leftovers. I ran the full suite and 92 tests passed. The new `test_merge_sorted` in tests/test_toolkit.py covers the issue case, the reversed case, either side empty, and interleaved input. No existing tests were modified or removed.\n\nPlease clean up before merging:\n- Delete tests/test_issue_repro.py. It duplicates `test_merge_sorted` in tests/test_toolkit.py.\n- Drop the `__pycache__/*.pyc` files from the diff and add `__pycache__/` to .gitignore if it isn't there already.\n\nNeither affects behaviour, so I'm approving.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

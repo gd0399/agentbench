@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified root cause and fix in toolkit/text.py; no test/doc conflicts. Ready for a patch.",
+   "instructions": "In toolkit/text.py (word_count, ~lines 19-20), replace `len(s.split())` with a split on whitespace and hyphens, e.g. `len([w for w in re.split(r\"[\\s-]+\", s) if w])` (add `import re` if missing). Ensure '' -> 0, leading/trailing hyphens and standalone '-' don't produce empty words. Keep existing tests passing (e.g. '  the quick  brown fox ' == 4) and make tests/test_issue_repro.py pass ('state-of-the-art design' == 5). Optionally add edge-case tests (standalone dash, leading/trailing hyphens). Do not change report.top_words (out of scope). Run the full test suite and report results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.word_count('state-of-the-art design') returns 2 because hyphenated words are treated as a single word. The reporter expects 5, so the function should split on hyphens as well as whitespace. Check the existing tests and README for documented behavior before changing it, since treating hyphens as separators may affect other inputs such as standalone dashes or leading/trailing hyphens."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 19-20: word_count is `len(s.split())`, which splits only on whitespace, so 'state-of-the-art design' gives 2. Fix: split on whitespace and hyphens, e.g. `len([w for w in re.split(r\"[\\s-]+\", s) if w])`. The filter on empty strings keeps '' -> 0 and handles leading/trailing hyphens and standalone dashes (a standalone '-' would count 0). The existing tests (test_word_count: '  the quick  brown fox ' == 4, and the empty-string test) are still satisfied. The README and docstrings say nothing about hyphens, so there is no documented conflict. report.top_words also uses s.split(), but the issue doesn't mention it.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________ test_hyphenated_words_counted_separately ___________________\n\n    def test_hyphenated_words_counted_separately():\n>       assert text.word_count('state-of-the-art design') == 5\nE       AssertionError: assert 2 == 5\nE        +  where 2 = <function word_count at 0x7fe6406967a0>('state-of-the-art design')\nE        +    where <function word_count at 0x7fe6406967a0> = text.word_count\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_hyphenated_words_counted_separately - ...\n1 failed in 0.02s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The fix is in the right place: `word_count` now splits on `[\\s-]+` and drops empty pieces. That is the actual cause, not a special case for the repro input. It is a one-line change. All 85 tests pass, and I did not see any edits to the existing tests.\n\nI probed edge cases:\n- 'well-known' gives 2.\n- 'a--b' gives 2.\n- 'foo-' gives 1.\n- '' gives 0.\n- '--' gives 0.\n- 'a - b' gives 2. It was 3 before, so a standalone hyphen is no longer counted as a word. That seems right, but it is a small behaviour change.\n- An en dash, as in 'a\u2013b', still counts as 1. That is out of scope for this issue.\n\nNon-blocking notes:\n1. The diff includes `__pycache__/*.pyc` files. Please make sure they are not committed, and consider adding a `.gitignore`.\n2. The new test sits in a separate `tests/test_issue_repro.py`. It would fit better in `tests/test_toolkit.py` next to the other `word_count` tests. A case for 'a - b' or a trailing hyphen would also be useful.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

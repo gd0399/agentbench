@@ -1,0 +1,42 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "escalate",
+   "reason": "The research shows `percentile` is documented and tested as nearest-rank, and the existing tests `test_percentile_mid` and `test_percentile_rounds_up` depend on that. Linear interpolation would break both tests. This looks like a feature request or API decision, not a clear bug. A maintainer needs to choose between three options: keep nearest-rank, add an opt-in `method='linear'`, or change the default and update the tests and docstring. The coder shouldn't pick one of these unilaterally.",
+   "instructions": "Summarize the issue for a maintainer. `stats.percentile([1,2,3,4], 50)` returns 2 because `toolkit/stats.py:48-58` implements documented nearest-rank, while the reporter expects numpy-style linear interpolation (2.5). Changing the default would break `test_percentile_mid` (expects 20, linear gives 29) and `test_percentile_rounds_up` (expects 20, linear gives 27.5). Give the maintainer these options: (1) close as working-as-designed and point to the docs, (2) add an opt-in `method='linear'` parameter that defaults to nearest-rank, which is backward compatible and the least risky, or (3) change the default to linear and update the tests and docstring, which is a breaking change. The repro test is `tests/test_issue_repro.py`. Recommend option 2 if the maintainer wants to support the request."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.percentile does not use linear interpolation between neighbouring ranks. stats.percentile([1, 2, 3, 4], 50) returns 2, but the expected result is 2.5, which matches numpy's default linear interpolation. Fix in toolkit/stats.py, then add a regression test in tests/test_toolkit.py. The test should cover the issue's example plus edge cases: p=0, p=100, a single-element list and unsorted input."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "tests/test_toolkit.py"
+  ],
+  "root_cause": "The behaviour is real, but it is documented and tested as intended, so this looks like a feature request or misunderstanding rather than a bug. toolkit/stats.py:48-58 `percentile` is documented as \"Nearest-rank percentile\". It computes rank = ceil(p*n/100) and returns ordered[rank-1], with no interpolation. For [1,2,3,4] and p=50 the rank is 2, so it returns 2. The repro test tests/test_issue_repro.py fails with `2 == 2.5`. Existing tests in tests/test_toolkit.py lock in nearest-rank semantics: test_percentile_mid expects percentile([15,20,35,40,50], 40) == 20, and test_percentile_rounds_up expects p=30 to give 20. Numpy-style linear interpolation would give 29 and 27.5 for those. Adopting it would break both tests. The maintainers need to choose between keeping nearest-rank, adding an opt-in `method='linear'` parameter that defaults to nearest-rank, or changing the default and updating the tests and docstring. The requested behaviour is only reachable by changing the percentile logic at lines 55-58.",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_percentile_interpolates _________________________\n\n    def test_percentile_interpolates():\n>       assert stats.percentile([1, 2, 3, 4], 50) == 2.5\nE       assert 2 == 2.5\nE        +  where 2 = <function percentile at 0x7fb98ae968e0>([1, 2, 3, 4], 50)\nE        +    where <function percentile at 0x7fb98ae968e0> = stats.percentile\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_percentile_interpolates - assert 2 == 2.5\n1 failed in 0.02s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

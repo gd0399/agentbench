@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug reproduced and root cause identified (regex [^a-z] in toolkit/text.py line 7 strips digits). No conflicts with existing tests. Ready for a fix.",
+   "instructions": "In toolkit/text.py, slugify (line ~7): change re.sub(r\"[^a-z]+\", \"-\", s) to re.sub(r\"[^a-z0-9]+\", \"-\", s). Keep the existing behaviour of stripping leading/trailing hyphens and lowercasing. Add a regression test in tests/test_toolkit.py asserting text.slugify('Top 10 Tips') == 'top-10-tips' (the repro in tests/test_issue_repro.py can be moved or kept). Run the full test suite, including the existing 'Hello, World!' test, and confirm everything passes."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.slugify drops numeric characters: slugify('Top 10 Tips') returns 'top-tips' instead of 'top-10-tips'. Likely the regex/character filter in toolkit/text.py only keeps letters (e.g. [a-z] rather than [a-z0-9]). Fix the filter to preserve digits and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 7, in slugify: re.sub(r\"[^a-z]+\", \"-\", s) treats every non-letter, digits included, as a separator. Because of this, \"10\" is replaced by \"-\" and then collapsed. The character class should be [^a-z0-9]+. The existing test only covers 'Hello, World!', so it doesn't conflict with the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________ test_slugify_keeps_digits ___________________________\n\n    def test_slugify_keeps_digits():\n>       assert text.slugify('Top 10 Tips') == 'top-10-tips'\nE       AssertionError: assert 'top-tips' == 'top-10-tips'\nE         \nE         - top-10-tips\nE         ?    ---\nE         + top-tips\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_slugify_keeps_digits - AssertionError:...\n1 failed in 0.24s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line regex change from [^a-z]+ to [^a-z0-9]+ fixes the root cause. Digits were being treated as separators. All 85 tests pass, and the existing slugify test is untouched. The regression test is added to tests/test_toolkit.py.\n\nNits to clean up before merge:\n- tests/test_issue_repro.py duplicates the test added to test_toolkit.py. Delete it.\n- The diff contains __pycache__/*.pyc files. Remove them from the patch and add __pycache__/ to .gitignore.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

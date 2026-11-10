@@ -1,0 +1,95 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "address review feedback: regression: existing tests fail test_median_even, test_summarize",
+   "instructions": ""
+  },
+  {
+   "step": 5,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 6,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "address review feedback: regression: existing tests fail test_median_even, test_summarize",
+   "instructions": ""
+  },
+  {
+   "step": 7,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 8,
+   "src": "reviewer",
+   "dst": "close_invalid",
+   "reason": "all 3 fixes contradict existing tested behaviour",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "close: invalid"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "median() returns a float for even lists"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_issue_repro _______________________________\n\n    def test_issue_repro():\n>       assert stats.median([1, 2, 3, 4]) == 2\nE       assert 2.5 == 2\nE        +  where 2.5 = <function median at 0x105a8db20>([1, 2, 3, 4])\nE        +    where <function median at 0x105a8db20> = stats.median\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_issue_repro - assert 2.5 == 2\n1 failed in 0.03s\n",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "SBFL suspicious lines: toolkit/stats.py:18 (0.58), toolkit/stats.py:13 (0.45), toolkit/stats.py:14 (0.45), toolkit/stats.py:15 (0.45), toolkit/stats.py:16 (0.45)"
+ },
+ "review": {
+  "approved": false,
+  "tests_passed": false,
+  "repro_passed": true,
+  "feedback": "regression: existing tests fail test_median_even, test_summarize",
+  "reviewer": "reviewer",
+  "attempt": 3
+ },
+ "resolution": "reported behaviour is intended"
+}

@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.initials('ada lovelace') returns 'al' but should return 'AL'; initials are not uppercased. Likely fix in toolkit/text.py: uppercase each initial character, and add a test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 45, in initials(): `\"\".join(p[0] for p in parts)` takes the first character of each word as-is and never uppercases it. Fix: use `p[0].upper()`. No docstring, README entry or existing test covers initials(), so the requested behaviour doesn't conflict with anything.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_initials_uppercase ____________________________\n\n    def test_initials_uppercase():\n>       assert text.initials('ada lovelace') == 'AL'\nE       AssertionError: assert 'al' == 'AL'\nE         \nE         - AL\nE         + al\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_initials_uppercase - AssertionError: a...\n1 failed in 0.14s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. It is a one-line change in toolkit/text.py, `p[0].upper()` in initials(), and it addresses the root cause rather than the repro input. The full suite passes (84 tests), and the existing tests were not modified. The new tests/test_issue_repro.py is a sensible regression test.\n\nEdge cases I checked: leading/trailing whitespace, hyphenated names, the empty string and accented characters all behave sensibly. The one oddity is that `'\u00df'.upper()` gives 'SS', so a name starting with \u00df yields two letters. That is a very rare case and not worth blocking on.\n\nBefore merging, drop the committed __pycache__/*.pyc files from the diff. They are build artifacts and shouldn't be in the patch. Adding `__pycache__/` to .gitignore would stop it happening again.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

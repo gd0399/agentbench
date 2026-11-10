@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Root cause is identified and reproduced: `and` should be `or` in the leap-year expression in toolkit/dates.py. No conflicts with existing tests. The next step is to write the fix.",
+   "instructions": "In toolkit/dates.py, line 5, function is_leap_year, change the expression to `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. The current code uses `and` between `year % 100 != 0` and `year % 400 == 0`, so it always returns False. Keep the change minimal. Make sure the regression test in tests/test_issue_repro.py (or a proper tests/test_dates.py) covers 2024, 2000, 1996 (True) and 1900, 2023, 2100 (False). Also check that days_in_month(<leap year>, 2) now returns 29, and add a test for that if none exists. Run the full test suite and report the results along with the diff."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "dates.is_leap_year(2024) returns False instead of True. The leap-year logic in toolkit/dates.py is likely wrong. The Gregorian rule is: divisible by 4, except century years, which must also be divisible by 400. Needs a fix and a regression test covering 2024, 1900 and 2000."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 5, is_leap_year: `year % 4 == 0 and (year % 100 != 0 and year % 400 == 0)` uses `and` where `or` is needed. The inner clause needs both `year % 100 != 0` and `year % 400 == 0`, and no year can satisfy both, so the function always returns False. The correct expression is `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. This also makes days_in_month(leap_year, 2) return 28 instead of 29. The repro test fails for 2024, 2000 and 1996, and passes for 1900, 2023 and 2100. No existing tests or docs contradict the fix.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=3 failed=3 errors=0\nFF...F                                                                   [100%]\n=================================== FAILURES ===================================\n_________________________ test_is_leap_year[2024-True] _________________________\n\nyear = 2024, expected = True\n\n    @pytest.mark.parametrize(\"year,expected\", [(2024, True), (2000, True), (1900, False), (2023, False), (2100, False), (1996, True)])\n    def test_is_leap_year(year, expected):\n>       assert dates.is_leap_year(year) is expected\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7fed3ca96660>(2024)\nE        +    where <function is_leap_year at 0x7fed3ca96660> = dates.is_leap_year\n\ntests/test_issue_repro.py:7: AssertionError\n_________________________ test_is_leap_year[2000-True] _________________________\n\nyear = 2000, expected = True\n\n    @pytest.mark.parametrize(\"year,expected\", [(2024, True), (2000, True), (1900, False), (2023, False), (2100, False), (1996, True)])\n    def test_is_leap_year(year, expected):\n>       assert dates.is_leap_year(year) is expected\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7fed3ca96660>(2000)\nE        +    where <function is_leap_year at 0x7fed3ca96660> = dates.is_leap_year\n\ntests/test_issue_repro.py:7: AssertionError\n_________________________ test_is_leap_year[1996-True] _________________________\n\nyear = 1996, expected = True\n\n    @pytest.mark.parametrize(\"year,expected\", [(2024, "
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The fix addresses the root cause. The century clause had `and` where it needed `or`, so only years divisible by 400 could ever be leap years. The one-line change in `toolkit/dates.py` is minimal. I compared `is_leap_year` against `calendar.isleap` for years 1 to 4999 and they match everywhere. `days_in_month(2024, m)` gives 29 for February. The full suite passes (91 tests). No existing tests were modified. The new `tests/test_issue_repro.py` covers 2024, 2000, 1900, 2100, 1996 and 2023, and checks February in `days_in_month`.\n\nBefore merging, please drop the `__pycache__/*.pyc` files from the diff. They are artifacts of running the tests, and they are not part of the change. Adding `__pycache__/` to `.gitignore` would stop this recurring. The change itself needs no further work.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

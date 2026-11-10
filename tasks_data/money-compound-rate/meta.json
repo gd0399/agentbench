@@ -1,0 +1,18 @@
+{
+  "id": "money-compound-rate",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "hard",
+  "expr": "money.compound_interest(1000, 0.12, 1, 12)",
+  "expected": "1126.83",
+  "actual": {
+    "ok": true,
+    "repr": "3895.98"
+  },
+  "failing_hidden_tests": [
+    "test_compound_monthly"
+  ],
+  "visible_tests": 83
+}

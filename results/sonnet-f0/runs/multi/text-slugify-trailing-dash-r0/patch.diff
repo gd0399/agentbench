@@ -1,0 +1,39 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..75c6182
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,3 @@
++__pycache__/
++*.pyc
++.pytest_cache/
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index ccf093a..f98a9f2 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -82,6 +82,12 @@ def test_clamp_bad():
+ def test_slugify_digits():
+     assert text.slugify('Top 10 Tips') == 'top-10-tips'
+ 
++def test_slugify_no_trailing_dash():
++    assert text.slugify('  Hello, World! ') == 'hello-world'
++
++def test_slugify_no_leading_dash():
++    assert text.slugify('  !Hello World') == 'hello-world'
++
+ def test_truncate_short():
+     assert text.truncate('hello', 10) == 'hello'
+ 
+diff --git a/toolkit/text.py b/toolkit/text.py
+index 6f06386..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -5,7 +5,7 @@ import re
+ def slugify(s):
+     s = s.strip().lower()
+     s = re.sub(r"[^a-z0-9]+", "-", s)
+-    return s
++    return s.strip("-")
+ 
+ 
+ def truncate(s, limit, suffix="..."):

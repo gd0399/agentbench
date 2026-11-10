@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause and no conflicts with existing tests. The next step is a fix.",
+   "instructions": "In toolkit/money.py, apply_discount (line 7), change `return round(price * percent / 100, 2)` to `return round(price - price * percent / 100, 2)`. Keep the existing ValueError bounds checks unchanged. Make sure apply_discount(80.0, 25) == 60.0. Add a regression test to tests/test_toolkit.py, for example apply_discount(80.0, 25) == 60.0, plus edge cases for 0% and 100%. The repro test tests/test_issue_repro.py should also pass. Also check the caller toolkit/report.py:25 (invoice_total). It already treats the result as the discounted subtotal, so it should need no change. Check whether any existing tests that cover invoice_total encoded the old, wrong values. Run the full test suite and report the results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "money",
+  "summary": "money.apply_discount(80.0, 25) returns 20.0 (the discount amount) instead of the discounted price 60.0. Reported as affecting production use. Likely the function returns price * percent/100 rather than price - that amount (or price * (1 - percent/100)). Fix in toolkit/money.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/money.py line 7, apply_discount: `return round(price * percent / 100, 2)` returns the discount amount, not the discounted price. It should return round(price - price*percent/100, 2) (equivalently price * (1 - percent/100)). The only existing test (test_discount_bounds) checks only the ValueError bounds, so it doesn't conflict. The caller toolkit/report.py:25 (invoice_total) treats the result as the discounted subtotal, so invoice totals are also wrong. They are currently computed on the discount amount, and the fix will correct them.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n______________________ test_apply_discount_returns_price _______________________\n\n    def test_apply_discount_returns_price():\n>       assert money.apply_discount(80.0, 25) == 60.0\nE       assert 20.0 == 60.0\nE        +  where 20.0 = <function apply_discount at 0x7f2c97292660>(80.0, 25)\nE        +    where <function apply_discount at 0x7f2c97292660> = money.apply_discount\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_apply_discount_returns_price - assert ...\n1 failed in 0.20s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause is in apply_discount, which returned the discount amount. It now returns price minus discount, rounded to 2 places. The bounds check is unchanged. The full suite passes (85 tests). I also ran the function directly. apply_discount(19.99, 15) gives 16.99, and apply_discount(80, 25) gives 60.0.\n\nI checked the only other caller, report.invoice_total. It already treats the result as the discounted subtotal and then adds tax. invoice_total([(2,40.0)], 25, 0.1) now gives 66.0, which is correct. That function was wrong before this patch and is now fixed with no change to report.py. The coder's claim matches what I found.\n\nNo existing tests were weakened or removed. The patch only adds tests.\n\nNits, not blockers:\n- Remove the committed __pycache__/*.pyc files from the diff, and consider adding a .gitignore.\n- tests/test_issue_repro.py duplicates test_discount_returns_discounted_price in test_toolkit.py. Drop one of them.\n- Consider adding an invoice_total regression test, since it was silently affected by this bug.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

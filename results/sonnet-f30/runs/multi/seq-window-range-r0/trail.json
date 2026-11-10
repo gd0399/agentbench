@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.sliding_window omits the final window. For ([1, 2, 3, 4], 3) it returns [(1, 2, 3)] instead of [(1, 2, 3), (2, 3, 4)]. This is likely an off-by-one error in the range bound, such as range(len(seq) - size) where it should be range(len(seq) - size + 1). Fix it in toolkit/seq.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py line 42, in sliding_window: the range bound is `range(len(items) - size)`, which is off by one. It should be `range(len(items) - size + 1)`. The last window is dropped. When size == len(items), the result is [] instead of one window. `stats.moving_average` uses the correct `+ 1` bound. No existing tests or docs contradict the expected behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n__________________ test_sliding_window_includes_final_window ___________________\n\n    def test_sliding_window_includes_final_window():\n>       assert seq.sliding_window([1, 2, 3, 4], 3) == [(1, 2, 3), (2, 3, 4)]\nE       assert [(1, 2, 3)] == [(1, 2, 3), (2, 3, 4)]\nE         \nE         Right contains one more item: (2, 3, 4)\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n_____________________ test_sliding_window_size_equals_len ______________________\n\n    def test_sliding_window_size_equals_len():\n>       assert seq.sliding_window([1, 2, 3], 3) == [(1, 2, 3)]\nE       assert [] == [(1, 2, 3)]\nE         \nE         Right contains one more item: (1, 2, 3)\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_sliding_window_includes_final_window\nFAILED tests/test_issue_repro.py::test_sliding_window_size_equals_len - asser...\n2 failed in 0.21s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approving. The fix is correct and minimal. The range bound was off by one, and `len(items) - size + 1` is the right count of windows. I ran the full suite and 85 tests pass. I also checked edge cases: size == len gives one window, size > len gives [], an empty list gives [], and size 1 gives all singletons. Existing tests were not modified, and the new tests in tests/test_issue_repro.py cover the issue case and the size == len boundary.\n\nOne nit: the diff includes committed __pycache__/*.pyc files. They are build artifacts and shouldn't be in the patch. Drop them or add them to .gitignore before merging. The code change itself needs no further work.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

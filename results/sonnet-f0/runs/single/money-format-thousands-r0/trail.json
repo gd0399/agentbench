@@ -1,0 +1,25 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "The format spec in format_currency was ':.2f', which has no grouping option.",
+  "suspected_files": [
+   "toolkit/money.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

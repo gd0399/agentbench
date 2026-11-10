@@ -1,0 +1,36 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 71297e8..e791cf5 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -124,6 +124,10 @@ def test_initials():
+ def test_camel_to_snake():
+     assert text.camel_to_snake('parseHttpResponse') == 'parse_http_response'
+ 
++def test_camel_to_snake_no_leading_underscore():
++    assert text.camel_to_snake('Value') == 'value'
++    assert text.camel_to_snake('FooBar') == 'foo_bar'
++
+ def test_chunk():
+     assert seq.chunk([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]
+ 
+diff --git a/toolkit/text.py b/toolkit/text.py
+index b3f89a8..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -48,7 +48,7 @@ def initials(name):
+ def camel_to_snake(s):
+     out = []
+     for i, c in enumerate(s):
+-        if c.isupper():
++        if c.isupper() and i > 0:
+             out.append("_")
+         out.append(c.lower())
+     return "".join(out)

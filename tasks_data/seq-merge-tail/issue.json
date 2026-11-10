@@ -1,0 +1,7 @@
+{
+  "number": 137,
+  "title": "merge_sorted drops trailing items",
+  "body": "**Describe the bug**\nCalling `seq.merge_sorted([1, 4, 6], [2, 3, 7, 8])` returns `[1, 2, 3, 4, 6]`, but it should return `[1, 2, 3, 4, 6, 7, 8]`.\n\n**To reproduce**\n```python\nfrom toolkit import seq\nprint(seq.merge_sorted([1, 4, 6], [2, 3, 7, 8]))\n```\n\n**Expected behaviour**\nExpected: `[1, 2, 3, 4, 6, 7, 8]`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "priya-r",
+  "labels": []
+}

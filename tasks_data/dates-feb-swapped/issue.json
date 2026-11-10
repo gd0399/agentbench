@@ -1,0 +1,7 @@
+{
+  "number": 152,
+  "title": "February lengths are swapped",
+  "body": "### What happened?\n`dates.days_in_month(2024, 2)` returns `28`.\n\n### What did you expect?\nIt should return `29` (expected: `29`).\n\n### Version\nlatest main",
+  "author": "t-nakamura",
+  "labels": []
+}

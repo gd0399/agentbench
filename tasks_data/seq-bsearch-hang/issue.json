@@ -1,0 +1,7 @@
+{
+  "number": 136,
+  "title": "binary_search hangs forever on a missing value",
+  "body": "### What happened?\n`seq.binary_search([1, 3, 5], 4)` never returns (hangs).\n\n### What did you expect?\nIt should return `-1` (expected: `-1`).\n\n### Version\nlatest main",
+  "author": "mlopez",
+  "labels": []
+}

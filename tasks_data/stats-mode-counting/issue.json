@@ -1,0 +1,7 @@
+{
+  "number": 105,
+  "title": "mode() always returns the first element",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.mode([1, 2, 2, 3])` returns `1`. Expected: `2`.\n\nThanks for the great library!",
+  "author": "t-nakamura",
+  "labels": []
+}

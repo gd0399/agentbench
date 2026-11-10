@@ -1,0 +1,7 @@
+{
+  "number": 110,
+  "title": "percentile() is off by one",
+  "body": "### What happened?\n`stats.percentile([15, 20, 35, 40, 50], 40)` returns `35`.\n\n### What did you expect?\nIt should return `20` (expected: `20`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

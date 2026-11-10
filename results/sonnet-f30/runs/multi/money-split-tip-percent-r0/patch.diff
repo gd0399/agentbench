@@ -1,0 +1,38 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 19b14fc..d9f7946 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -195,6 +195,12 @@ def test_split_bill():
+ def test_split_bill_uneven():
+     assert money.split_bill(100, 3) == 33.33
+ 
++def test_split_bill_tip_is_percent():
++    assert money.split_bill(100, 4, tip_percent=20) == 30.0
++
++def test_split_bill_tip_non_round():
++    assert money.split_bill(100, 3, tip_percent=15) == 38.33
++
+ def test_compound_annual():
+     assert money.compound_interest(1000, 0.05, 2) == 1102.5
+ 
+diff --git a/toolkit/money.py b/toolkit/money.py
+index 8af304f..b7f79dd 100644
+--- a/toolkit/money.py
++++ b/toolkit/money.py
+@@ -10,7 +10,7 @@ def apply_discount(price, percent):
+ def split_bill(total, people, tip_percent=0):
+     if people <= 0:
+         raise ValueError("people must be positive")
+-    with_tip = total * (1 + tip_percent)
++    with_tip = total * (1 + tip_percent / 100)
+     return round(with_tip / people, 2)
+ 
+ 

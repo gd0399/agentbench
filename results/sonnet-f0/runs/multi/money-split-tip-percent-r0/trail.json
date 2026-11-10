@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause, and the fix doesn't conflict with existing tests. No patch exists yet, so the coder should write it.",
+   "instructions": "In toolkit/money.py, in split_bill (around line 13), change `with_tip = total * (1 + tip_percent)` to `with_tip = total * (1 + tip_percent / 100)`. This matches apply_discount in the same file, which already divides percent by 100. Add a regression test to tests/test_toolkit.py asserting that money.split_bill(100, 4, tip_percent=20) == 30.0. You can reuse tests/test_issue_repro.py as a reference for the test. Keep the change minimal. Run the full test suite and confirm the repro test and the existing tests (which only cover tip_percent=0) all pass."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "money",
+  "summary": "money.split_bill treats tip_percent as a multiplier rather than a percentage. split_bill(100, 4, tip_percent=20) returns 525.0, which is (100 + 100*20)/4. It should return 30.0, which is 100*(1 + 20/100)/4. The fix is to divide tip_percent by 100 in toolkit/money.py. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py"
+  ],
+  "root_cause": "toolkit/money.py line 13 in split_bill: `with_tip = total * (1 + tip_percent)` uses tip_percent as a raw multiplier. With tip_percent=20 this gives 100*21/4 = 525.0. It should be `total * (1 + tip_percent / 100)`, consistent with apply_discount in the same file, which divides percent by 100. The existing tests only cover tip_percent=0, so they don't conflict with the fix.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n________________________ test_split_bill_tip_is_percent ________________________\n\n    def test_split_bill_tip_is_percent():\n>       assert money.split_bill(100, 4, tip_percent=20) == 30.0\nE       assert 525.0 == 30.0\nE        +  where 525.0 = <function split_bill at 0x7efc002327a0>(100, 4, tip_percent=20)\nE        +    where <function split_bill at 0x7efc002327a0> = money.split_bill\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_split_bill_tip_is_percent - assert 525...\n1 failed in 0.23s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix in toolkit/money.py is correct and minimal. `split_bill` now computes `total * (1 + tip_percent / 100)`. That fixes the cause, which was the unit, and isn't special-cased to the issue's inputs. `split_bill(100, 4, tip_percent=20)` returns 30.0. The default `tip_percent=0` behaves as before. I found no other callers of `split_bill` that pass a fractional tip. The full suite passes (85), and the existing tests were not changed or weakened.\n\nPlease clean up before merging:\n- Remove the committed `__pycache__/*.pyc` files. Consider adding a `.gitignore`.\n- Delete `tests/test_issue_repro.py`. It duplicates the regression test you added to `tests/test_toolkit.py`.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,72 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause in toolkit/money.py apply_discount, with no conflict with existing tests. The next step is to write the fix.",
+   "instructions": "Fix apply_discount in toolkit/money.py (line ~7). It currently returns `round(price * percent / 100, 2)`, which is the discount amount. Change it to return the discounted price: `round(price * (1 - percent / 100), 2)`. Keep the existing ValueError bounds check unchanged. Then check the caller toolkit/report.py:25 (invoice_total). It treats the result as the discounted subtotal, so it should be correct after the fix. Confirm that and don't add a compensating change there. Make sure tests/test_issue_repro.py passes (apply_discount(80.0, 25) == 60.0) and that existing tests still pass. Also check the edge cases: percent=0 returns the full price, and percent=100 returns 0.0. Keep the patch minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "money",
+  "summary": "apply_discount returns the discount instead of the price"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/money.py line 7, apply_discount: `return round(price * percent / 100, 2)` returns the discount amount (price*percent%) instead of the discounted price. It should be `round(price * (1 - percent / 100), 2)` (or price - discount). The caller report.invoice_total (toolkit/report.py:25) treats the result as the discounted subtotal, so it is also wrong whenever discount_percent is non-zero (and wrongly returns 0 with no discount). The existing test only checks bounds (ValueError for 120), so there is no conflict.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________ test_apply_discount_returns_discounted_price _________________\n\n    def test_apply_discount_returns_discounted_price():\n>       assert money.apply_discount(80.0, 25) == 60.0\nE       assert 20.0 == 60.0\nE        +  where 20.0 = <function apply_discount at 0x7f82adf96660>(80.0, 25)\nE        +    where <function apply_discount at 0x7f82adf96660> = money.apply_discount\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_apply_discount_returns_discounted_price\n1 failed in 0.28s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and addresses the root cause. apply_discount now returns price * (1 - percent/100), rounded to 2 places. The validation is unchanged. I checked these cases:\n- apply_discount(80, 25) returns 60.0.\n- apply_discount(19.99, 15) returns 16.99.\n- The only other caller, report.invoice_total, treats the result as the discounted subtotal. It was producing wrong totals before and is now correct: [(2, 40.0)] at 25% discount and 10% tax gives 66.0.\n- All 82 tests pass, and no existing tests were modified. The new repro test is a reasonable addition.\n\nBefore merging, drop the __pycache__/*.pyc files from the diff. They are build artifacts, and adding a .gitignore entry for them would be sensible. The actual change is a one-line edit to money.py plus the new test.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

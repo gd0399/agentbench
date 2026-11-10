@@ -1,0 +1,19 @@
+{
+  "id": "seq-merge-or",
+  "kind": "bug",
+  "category": "operator",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "easy",
+  "expr": "seq.merge_sorted([1], [2, 3])",
+  "expected": "[1, 2, 3]",
+  "actual": {
+    "ok": false,
+    "exc": "IndexError"
+  },
+  "failing_hidden_tests": [
+    "test_merge_sorted",
+    "test_merge_sorted_stable"
+  ],
+  "visible_tests": 82
+}

@@ -1,0 +1,16 @@
+{
+  "id": "invalid-rotate-left",
+  "kind": "invalid",
+  "category": "invalid",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "n/a",
+  "expr": "seq.rotate([1, 2, 3], 1)",
+  "expected": "[2, 3, 1]",
+  "actual": {
+    "ok": true,
+    "repr": "[3, 1, 2]"
+  },
+  "failing_hidden_tests": [],
+  "visible_tests": 84
+}

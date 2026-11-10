@@ -1,0 +1,16 @@
+{
+  "id": "invalid-percentile-interp",
+  "kind": "invalid",
+  "category": "invalid",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "n/a",
+  "expr": "stats.percentile([1, 2, 3, 4], 50)",
+  "expected": "2.5",
+  "actual": {
+    "ok": true,
+    "repr": "2"
+  },
+  "failing_hidden_tests": [],
+  "visible_tests": 84
+}

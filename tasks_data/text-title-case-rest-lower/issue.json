@@ -1,0 +1,7 @@
+{
+  "number": 122,
+  "title": "title_case keeps stray capitals",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.title_case('hELLO wORLD')` returns `'HELLO WORLD'`. Expected: `'Hello World'`.\n\nThanks for the great library!",
+  "author": "sven.o",
+  "labels": []
+}

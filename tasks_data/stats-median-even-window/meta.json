@@ -1,0 +1,19 @@
+{
+  "id": "stats-median-even-window",
+  "kind": "bug",
+  "category": "cross-module",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "report.summarize([1, 2, 3, 4])",
+  "expected": "{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}",
+  "actual": {
+    "ok": true,
+    "repr": "{'count': 4, 'mean': 2.5, 'median': 3.5, 'max': 4}"
+  },
+  "failing_hidden_tests": [
+    "test_median_even",
+    "test_summarize"
+  ],
+  "visible_tests": 82
+}

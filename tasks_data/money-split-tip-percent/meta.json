@@ -1,0 +1,18 @@
+{
+  "id": "money-split-tip-percent",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "hard",
+  "expr": "money.split_bill(100, 4, tip_percent=20)",
+  "expected": "30.0",
+  "actual": {
+    "ok": true,
+    "repr": "525.0"
+  },
+  "failing_hidden_tests": [
+    "test_split_bill_tip"
+  ],
+  "visible_tests": 83
+}

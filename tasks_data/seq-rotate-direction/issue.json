@@ -1,0 +1,7 @@
+{
+  "number": 131,
+  "title": "rotate() rotates left, docs say right",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`seq.rotate([1, 2, 3, 4, 5], 2)` returns `[3, 4, 5, 1, 2]`. Expected: `[4, 5, 1, 2, 3]`.\n\nThanks for the great library!",
+  "author": "sven.o",
+  "labels": []
+}

@@ -1,0 +1,7 @@
+{
+  "number": 114,
+  "title": "clamp() rejects lo == hi",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.clamp(3, 3, 3)` raises `ValueError`. Expected: `3`.\n\nThanks for the great library!",
+  "author": "dev-dana",
+  "labels": []
+}

@@ -1,0 +1,7 @@
+{
+  "number": 113,
+  "title": "clamp() returns the lower bound for in-range values",
+  "body": "### What happened?\n`stats.clamp(5, 0, 10)` returns `0`.\n\n### What did you expect?\nIt should return `5` (expected: `5`).\n\n### Version\nlatest main",
+  "author": "octocat",
+  "labels": []
+}

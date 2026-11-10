@@ -1,0 +1,7 @@
+{
+  "number": 115,
+  "title": "slugify leaves a trailing dash",
+  "body": "### What happened?\n`text.slugify('  Hello, World! ')` returns `'hello-world-'`.\n\n### What did you expect?\nIt should return `'hello-world'` (expected: `'hello-world'`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is triaged and reproduced with a clear root cause (off-by-one at toolkit/stats.py line 65). No conflicts with existing tests. No patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/stats.py, function moving_average (around line 65), change `for i in range(len(values) - window):` to `for i in range(len(values) - window + 1):`. Keep the existing ValueError for window<=0. Also consider the case window > len(values): the new range should be empty or negative, so it should return [] \u2014 verify that. Add a regression test in tests/test_toolkit.py covering moving_average([2, 4, 6], 3) == [4.0] and moving_average([1, 2, 3, 4], 2) == [1.5, 2.5, 3.5]. Run tests/test_issue_repro.py and the full test suite to confirm everything passes. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.moving_average drops the last window (off-by-one). moving_average([2, 4, 6], 3) returns [] but should return [4.0]. The window loop likely stops one position early, e.g. range(len(xs) - window) instead of range(len(xs) - window + 1). Fix in toolkit/stats.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 65 in moving_average: `for i in range(len(values) - window):` is off by one and omits the last window. It should be `range(len(values) - window + 1)`. For [2,4,6] with window 3 the range is 0 and the result is []. No existing test or doc contradicts the expected behaviour. The only existing test, test_moving_average_bad, checks window<=0 raising ValueError.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_______________________ test_moving_average_last_window ________________________\n\n    def test_moving_average_last_window():\n>       assert stats.moving_average([2, 4, 6], 3) == [4.0]\nE       assert [] == [4.0]\nE         \nE         Right contains one more item: 4.0\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n_________________________ test_moving_average_multiple _________________________\n\n    def test_moving_average_multiple():\n>       assert stats.moving_average([1, 2, 3, 4], 2) == [1.5, 2.5, 3.5]\nE       assert [1.5, 2.5] == [1.5, 2.5, 3.5]\nE         \nE         Right contains one more item: 3.5\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_moving_average_last_window - assert []...\nFAILED tests/test_issue_repro.py::test_moving_average_multiple - assert [1.5,...\n2 failed in 0.02s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line change in `toolkit/stats.py` is right. `range(len(values) - window)` stopped one window short, and `range(len(values) - window + 1)` fixes that at the root. I checked the edge cases by reading the code, not by running them:\n- `[2,4,6]` with window 3 gives `[4.0]`.\n- Window equal to the length gives one window.\n- Window larger than the length gives a negative range, so the result is `[]`, as before.\n- Window <= 0 still raises `ValueError`.\n\nThe full suite passes (86). No existing tests were changed or weakened.\n\nNits, not blocking:\n- `tests/test_issue_repro.py` and the new tests in `test_toolkit.py` cover the same cases. Keep one set, preferably the ones in `test_toolkit.py`.\n- Drop the `__pycache__/*.pyc` files from the diff. They look like test-run artifacts, so they should be removed or gitignored.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

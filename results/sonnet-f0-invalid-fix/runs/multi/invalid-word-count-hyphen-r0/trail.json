@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause and no conflict with existing tests. The next step is a fix.",
+   "instructions": "In toolkit/text.py (lines ~19-20), change word_count so it splits on whitespace and hyphens and drops empty tokens. For example, use `len([w for w in re.split(r\"[\\s-]+\", s) if w])`, and make sure `re` is imported. Existing behaviour must hold: '' -> 0 and '  the quick  brown fox ' -> 4. 'state-of-the-art design' must give 5. Keep the repro test tests/test_issue_repro.py and move or merge it into the regular text tests if appropriate. Add edge-case tests for a leading or trailing hyphen, consecutive hyphens such as 'a--b', and a lone '-'. Add a short docstring to word_count stating that hyphens separate words. Do not change top_words in report.py, which is out of scope. Run the full test suite and confirm all tests pass."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.word_count('state-of-the-art design') returns 2 because hyphenated words are treated as a single word. The reporter expects 5, so hyphens should act as word separators. The fix is likely in toolkit/text.py, in the tokenization or split logic of word_count. Add a test for hyphenated input."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 19-20: word_count is `len(s.split())`, which splits only on whitespace, so 'state-of-the-art design' gives 2. Hyphens are not treated as separators. A fix would split on whitespace and hyphens, e.g. `len([w for w in re.split(r\"[\\s-]+\", s) if w])`. Empty tokens must be filtered so the existing tests still pass: '' -> 0 and '  the quick  brown fox ' -> 4. The issue does not contradict existing tests or docs. word_count has no docstring, and no test covers hyphens. Repro test is tests/test_issue_repro.py, which fails with 2 != 5; the other 84 tests pass. top_words in report.py also uses s.split() but is not part of this issue.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________ test_word_count_hyphenated __________________________\n\n    def test_word_count_hyphenated():\n>       assert text.word_count('state-of-the-art design') == 5\nE       AssertionError: assert 2 == 5\nE        +  where 2 = <function word_count at 0x7f79f0dc27a0>('state-of-the-art design')\nE        +    where <function word_count at 0x7f79f0dc27a0> = text.word_count\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_word_count_hyphenated - AssertionError...\n1 failed in 0.06s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and it addresses the root cause. word_count now splits on `[\\s-]+` and drops empty tokens, so 'state-of-the-art design' gives 5. Leading and trailing hyphens, 'a--b' and a lone '-' (or a spaced ' - ') are all handled without inflating the count. Existing behaviour is unchanged: the original whitespace and empty-string tests still pass, and the full suite is 88/88. No existing tests were edited. The new tests only add edge cases in a new file. word_count has no other callers in the repo.\n\nNit: the diff includes __pycache__/*.pyc files. They look like test-run artifacts, and you should leave them out of the commit or add them to .gitignore. This doesn't block the merge.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

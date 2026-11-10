@@ -1,0 +1,82 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: an off-by-one in toolkit/text.py line 14. The check `len(s) < limit` should be `<=`. It doesn't conflict with existing tests, and no patch exists yet.",
+   "instructions": "In toolkit/text.py, in truncate() at about line 14, change `if len(s) < limit: return s` to `if len(s) <= limit: return s`. Make no other behavioural changes. Keep the repro test tests/test_issue_repro.py::test_truncate_exact_fit, which asserts that truncate('hello', 5) == 'hello'. Run the full test suite and confirm that the repro test and the existing truncate tests (limit 10 for 'hello'; 'hello world' at 8) all pass. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "open_pr",
+   "reason": "generalist fixed the issue and checks pass",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  },
+  {
+   "agent": "coder",
+   "error": "InjectedFailure: injected failure in coder (call 2)",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 3)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: FAILED -> generalist",
+  "generalist: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "truncate() shortens strings that already fit"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "Off-by-one in the length check in truncate().",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_truncate_exact_fit ____________________________\n\n    def test_truncate_exact_fit():\n>       assert text.truncate('hello', 5) == 'hello'\nE       AssertionError: assert 'he...' == 'hello'\nE         \nE         - hello\nE         + he...\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_truncate_exact_fit - AssertionError: a...\n1 failed in 0.26s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

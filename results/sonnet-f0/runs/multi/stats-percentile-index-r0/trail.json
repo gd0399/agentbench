@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: line 58 of toolkit/stats.py uses the 1-based nearest rank as a 0-based index. The fix is clear and small.",
+   "instructions": "In toolkit/stats.py percentile(), change line 58 from `return ordered[int(rank)]` to `return ordered[int(rank) - 1]`. Leave the p == 0 special case alone. Make sure tests/test_issue_repro.py passes: p=40 must return 20, and p=100 must return 50 with no IndexError. Add regression tests to tests/test_toolkit.py for p=40, p=100, and p=0, plus a check that the other existing percentile values are still correct. Then run the full test suite to confirm nothing else broke. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.percentile([15, 20, 35, 40, 50], 40) returns 35 but the reporter expects 20. This looks like an off-by-one in the rank or index calculation in toolkit/stats.py. The nearest-rank method gives ceil(0.4*5)=2, so the 2nd value, 20. A 0-based index computed without subtracting 1 would give 35, which matches the observed result. The next step is to read percentile() in toolkit/stats.py, confirm which percentile definition it uses, fix the index, and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 58, percentile(): line 57 correctly computes the 1-based nearest rank, ceil(p*n/100). Line 58 then uses it as a 0-based index with `ordered[int(rank)]`, so it needs `ordered[int(rank) - 1]`. For p=40 and n=5 the rank is 2, so the code returns ordered[2]=35 instead of ordered[1]=20. The same bug makes p=100 raise IndexError, because rank=n. The existing p=0 special case on line 55 returns ordered[0] and is unaffected. The docstring says \"Nearest-rank\", which agrees with the expected 20, so the issue doesn't conflict with the docs or tests. The repro tests are in tests/test_issue_repro.py.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_________________________ test_percentile_nearest_rank _________________________\n\n    def test_percentile_nearest_rank():\n>       assert stats.percentile([15, 20, 35, 40, 50], 40) == 20\nE       assert 35 == 20\nE        +  where 35 = <function percentile at 0x7ff70c0928e0>([15, 20, 35, 40, 50], 40)\nE        +    where <function percentile at 0x7ff70c0928e0> = stats.percentile\n\ntests/test_issue_repro.py:5: AssertionError\n_____________________________ test_percentile_100 ______________________________\n\n    def test_percentile_100():\n>       assert stats.percentile([15, 20, 35, 40, 50], 100) == 50\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:9: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [15, 20, 35, 40, 50], p = 100\n\n    def percentile(values, p):\n        \"\"\"Nearest-rank percentile, p in [0, 100].\"\"\"\n        if not values:\n            raise ValueError(\"percentile() of empty sequence\")\n        if p < 0 or p > 100:\n            raise ValueError(\"p must be between 0 and 100\")\n        ordered = sorted(values)\n        if p == 0:\n            return ordered[0]\n        rank = -(-p * len(ordered) // 100)\n>       return ordered[int(rank)]\n               ^^^^^^^^^^^^^^^^^^\nE       IndexError: list index out of range\n\nt"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and addresses the root cause. Nearest-rank is 1-based, so `ordered[int(rank) - 1]` is the right index. The p=0 special case already handles the lower bound. For any p > 0, rank is at least 1, so the index can't go negative. For p = 100, rank equals n, so the old IndexError is gone. I ran the suite and all 86 tests pass. No existing tests were modified or weakened, and the new tests check the right values: p=40 gives 20, and p=100 gives 50.\n\nCleanup to do before merging (not blocking):\n- Remove the committed `__pycache__/*.pyc` files. They're build artifacts, and a `.gitignore` entry would stop them coming back.\n- `tests/test_issue_repro.py` duplicates the new tests in `tests/test_toolkit.py`. `test_percentile_100` is defined in both files. Delete the repro file and keep the tests in `test_toolkit.py`.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

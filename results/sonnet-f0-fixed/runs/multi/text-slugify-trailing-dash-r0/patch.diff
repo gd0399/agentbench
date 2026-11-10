@@ -1,0 +1,64 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..50e72cd
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..a710892
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..24a62b2
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..5840677
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import text
++
++
++def test_slugify_no_trailing_dash():
++    assert text.slugify('  Hello, World! ') == 'hello-world'
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..18e0668
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..19e53af
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..7f14e01
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..5d631dc
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..c8679c7
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..2a31e3b
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..48a8c59
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/text.py b/toolkit/text.py
+index 6f06386..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -5,7 +5,7 @@ import re
+ def slugify(s):
+     s = s.strip().lower()
+     s = re.sub(r"[^a-z0-9]+", "-", s)
+-    return s
++    return s.strip("-")
+ 
+ 
+ def truncate(s, limit, suffix="..."):

@@ -1,0 +1,64 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..35734b8
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..3b5482f
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..da0cefa
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..4e6e285
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import text
++
++
++def test_truncate_exact_fit():
++    assert text.truncate('hello', 5) == 'hello'
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..9ef125a
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..8bdfb1c
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..d9a77cd
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..22cea9f
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..a6abed9
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..721a09e
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..a69e1cc
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/text.py b/toolkit/text.py
+index a60f70b..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -11,7 +11,7 @@ def slugify(s):
+ def truncate(s, limit, suffix="..."):
+     if limit < len(suffix):
+         raise ValueError("limit too small for suffix")
+-    if len(s) < limit:
++    if len(s) <= limit:
+         return s
+     return s[:limit - len(suffix)] + suffix
+ 

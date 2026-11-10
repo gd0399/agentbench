@@ -1,0 +1,18 @@
+{
+  "id": "money-tax-zero",
+  "kind": "bug",
+  "category": "cross-module",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "easy",
+  "expr": "report.invoice_total([(1, 100.0)], tax_rate=0)",
+  "expected": "100.0",
+  "actual": {
+    "ok": false,
+    "exc": "ValueError"
+  },
+  "failing_hidden_tests": [
+    "test_tax_zero"
+  ],
+  "visible_tests": 83
+}

@@ -1,0 +1,66 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..dd2da71
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..dbb902d
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..a0f57aa
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..d00fdb9
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,10 @@
++from toolkit import stats
++
++
++def test_clamp_in_range():
++    assert stats.clamp(5, 0, 10) == 5
++
++
++def test_clamp_below_and_above():
++    assert stats.clamp(-3, 0, 10) == 0
++    assert stats.clamp(15, 0, 10) == 10
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..ddedc8c
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..35d5215
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..b4e1b37
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..4330869
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..315a3e4
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..38451fa
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..cc4db59
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/stats.py b/toolkit/stats.py
+index 8b4d2f1..98df0d4 100644
+--- a/toolkit/stats.py
++++ b/toolkit/stats.py
+@@ -70,4 +70,4 @@ def moving_average(values, window):
+ def clamp(x, lo, hi):
+     if lo > hi:
+         raise ValueError("lo must be <= hi")
+-    return min(lo, max(x, hi))
++    return max(lo, min(x, hi))

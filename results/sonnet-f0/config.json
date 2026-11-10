@@ -1,0 +1,24 @@
+{
+  "tasks_dir": "tasks_data",
+  "out": "results/sonnet-f0",
+  "systems": [
+    "single",
+    "multi"
+  ],
+  "backend": "llm",
+  "model": "anthropic:claude-sonnet-5-5",
+  "fallback_models": [
+    "anthropic:claude-haiku-5-5"
+  ],
+  "router": "llm",
+  "limit": null,
+  "only": null,
+  "repeats": 1,
+  "workers": 10,
+  "fault_rate": 0.0,
+  "seed": 0,
+  "budget_usd": 1.0,
+  "max_coder_attempts": 3,
+  "max_agent_steps": 25,
+  "max_single_steps": 60
+}

@@ -1,0 +1,7 @@
+{
+  "number": 153,
+  "title": "March is reported as Q2",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`dates.quarter_of(3)` returns `2`. Expected: `1`.\n\nThanks for the great library!",
+  "author": "sven.o",
+  "labels": []
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dates-feb-swapped",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "hard",
+  "expr": "dates.days_in_month(2024, 2)",
+  "expected": "29",
+  "actual": {
+    "ok": true,
+    "repr": "28"
+  },
+  "failing_hidden_tests": [
+    "test_day_of_year",
+    "test_day_of_year_bad",
+    "test_day_of_year_leap",
+    "test_days_in_feb_leap",
+    "test_days_in_month"
+  ],
+  "visible_tests": 79
+}

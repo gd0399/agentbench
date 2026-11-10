@@ -1,0 +1,7 @@
+{
+  "number": 141,
+  "title": "100% discount raises ValueError",
+  "body": "### What happened?\n`money.apply_discount(50.0, 100)` raises `ValueError`.\n\n### What did you expect?\nIt should return `0.0` (expected: `0.0`).\n\n### Version\nlatest main",
+  "author": "t-nakamura",
+  "labels": []
+}

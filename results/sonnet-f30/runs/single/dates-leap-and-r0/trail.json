@@ -1,0 +1,25 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "The leap-year condition was `year%4==0 and (year%100!=0 and year%400==0)`. That is only true for years divisible by 400. The correct rule is `year%100!=0 or year%400==0`.",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

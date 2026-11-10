@@ -1,0 +1,41 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "escalate",
+   "reason": "This is not a bug. is_leap_year(1900) correctly returns False under the Gregorian rule: 1900 is divisible by 100 but not by 400. The existing test at tests/test_toolkit.py:220 already asserts [False, True, True, False] for 1900, 2000, 2024 and 2023. A coder fix would break correct behavior. Closing the issue is not an allowed move, so a human should do it.",
+   "instructions": "Recommend closing issue #164 as \"working as intended\". Suggested reply to @octocat: a year divisible by 100 is a leap year only if it is also divisible by 400, so 1900 is not a leap year and 2000 is. Make no code change. Delete the failing repro file tests/test_issue_repro.py, because it encodes the reporter's incorrect expectation."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "question",
+  "severity": "low",
+  "component": "dates",
+  "summary": "Reporter expects dates.is_leap_year(1900) to return True, but this is likely not a bug. Under Gregorian rules, a year divisible by 100 is a leap year only if it is also divisible by 400. 1900 is not divisible by 400, so False is correct. Next step: have the researcher check that is_leap_year in toolkit/dates.py implements the full rule (div by 4, except centuries, unless div by 400). They should also check that tests cover 1900 (False) and 2000 (True). If so, close the issue with an explanation and make no code change."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "Not a bug. toolkit/dates.py line 5 implements the full Gregorian rule: year % 4 == 0 and (year % 100 != 0 or year % 400 == 0). 1900 is divisible by 100 but not by 400, so False is correct. tests/test_toolkit.py:220 asserts is_leap_year for (1900, 2000, 2024, 2023) == [False, True, True, False], so the issue's expectation contradicts the existing tests. The repro test in tests/test_issue_repro.py encodes the reporter's wrong expectation and fails, which is expected. It should be deleted, not fixed. Recommend closing the issue with an explanation and making no code change.",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________________ test_1900_is_leap_year ____________________________\n\n    def test_1900_is_leap_year():\n        # Issue's expectation (contradicts Gregorian rules and existing tests)\n>       assert dates.is_leap_year(1900) is True\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7fe224e96660>(1900)\nE        +    where <function is_leap_year at 0x7fe224e96660> = dates.is_leap_year\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_1900_is_leap_year - assert False is True\n1 failed in 0.04s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

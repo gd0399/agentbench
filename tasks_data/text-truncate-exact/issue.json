@@ -1,0 +1,7 @@
+{
+  "number": 117,
+  "title": "truncate() shortens strings that already fit",
+  "body": "**Describe the bug**\nCalling `text.truncate('hello', 5)` returns `'he...'`, but it should return `'hello'`.\n\n**To reproduce**\n```python\nfrom toolkit import text\nprint(text.truncate('hello', 5))\n```\n\n**Expected behaviour**\nExpected: `'hello'`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "priya-r",
+  "labels": []
+}

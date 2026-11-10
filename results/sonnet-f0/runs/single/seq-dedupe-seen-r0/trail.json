@@ -1,0 +1,25 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "dedupe() checked `x not in seen` but never added items to `seen`, so nothing was filtered.",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

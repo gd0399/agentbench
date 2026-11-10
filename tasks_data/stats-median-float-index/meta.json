@@ -1,0 +1,21 @@
+{
+  "id": "stats-median-float-index",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "easy",
+  "expr": "stats.median([3, 1, 2])",
+  "expected": "2",
+  "actual": {
+    "ok": false,
+    "exc": "TypeError"
+  },
+  "failing_hidden_tests": [
+    "test_median_even",
+    "test_median_odd",
+    "test_summarize",
+    "test_summarize_unsorted"
+  ],
+  "visible_tests": 80
+}

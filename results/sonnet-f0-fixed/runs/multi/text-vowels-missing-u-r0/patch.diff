@@ -1,0 +1,84 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..e27e55c
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..049f53f
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..1a29add
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..e2ef6eb
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,9 @@
++from toolkit import text
++
++
++def test_count_vowels_education():
++    assert text.count_vowels('Education') == 5
++
++
++def test_count_vowels_u():
++    assert text.count_vowels('u') == 1
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index aa5a958..29062f3 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -118,6 +118,11 @@ def test_title_case_mixed():
+ def test_initials():
+     assert text.initials('ada  lovelace byron') == 'ALB'
+ 
++def test_count_vowels_includes_u():
++    assert text.count_vowels('Education') == 5
++    assert text.count_vowels('u') == 1
++    assert text.count_vowels('U') == 1
++
+ def test_camel_to_snake():
+     assert text.camel_to_snake('parseHttpResponse') == 'parse_http_response'
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..e0e4dac
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..cb0dea7
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..a0f03f0
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..98a534d
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..0ba5110
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..fc5012d
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..5020d54
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/text.py b/toolkit/text.py
+index 93a9396..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -37,7 +37,7 @@ def title_case(s, minor=("a", "an", "the", "of", "and", "or", "in")):
+ 
+ 
+ def count_vowels(s):
+-    return sum(1 for c in s.lower() if c in "aeio")
++    return sum(1 for c in s.lower() if c in "aeiou")
+ 
+ 
+ def initials(name):

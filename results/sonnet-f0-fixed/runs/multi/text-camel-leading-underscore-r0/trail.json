@@ -1,0 +1,76 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause in toolkit/text.py camel_to_snake, and it doesn't conflict with existing tests. The next step is to write the fix.",
+   "instructions": "Fix camel_to_snake in toolkit/text.py (about lines 48-54). Don't prepend \"_\" to an uppercase character at index 0. Use the enumerate index `i` that is already there, and add the underscore only when i > 0. Make sure 'Value' returns 'value' and that lowerCamel input such as 'fooBar' still returns 'foo_bar'. Move the regression test from tests/test_issue_repro.py (test_camel_to_snake_no_leading_underscore) into tests/test_toolkit.py, or add an equivalent test there. Run the full test suite and report the results. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "escalate",
+   "reason": "coder and generalist both failed",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "coder",
+   "error": "ModelUnavailable: all models failed for coder: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "all models failed for supervisor: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_01",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  },
+  {
+   "agent": "generalist",
+   "error": "ModelUnavailable: all models failed for generalist: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 're",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: FAILED -> generalist",
+  "generalist: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.camel_to_snake('Value') returns '_value' instead of 'value'. A leading uppercase letter is wrongly given an underscore prefix. The fix is likely in toolkit/text.py: don't insert an underscore at the start of the string, e.g. by skipping index 0 or stripping a leading underscore. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py camel_to_snake (lines 48-54): for every uppercase char, including the one at index 0, it appends \"_\" before the lowercased char. `i` from enumerate is unused, so there is no check to skip the underscore at the start of the string. 'Value' -> '_value'. The existing test only covers lowerCamel input, so it doesn't conflict with the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________ test_camel_to_snake_no_leading_underscore ___________________\n\n    def test_camel_to_snake_no_leading_underscore():\n>       assert text.camel_to_snake('Value') == 'value'\nE       AssertionError: assert '_value' == 'value'\nE         \nE         - value\nE         + _value\nE         ? +\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_camel_to_snake_no_leading_underscore\n1 failed in 0.02s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

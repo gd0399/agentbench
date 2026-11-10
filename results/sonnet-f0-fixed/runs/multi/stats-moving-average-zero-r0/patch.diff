@@ -1,0 +1,85 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..08ba15c
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..45ce94f
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..0a77f73
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..b2c2737
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,7 @@
++import pytest
++from toolkit import stats
++
++
++def test_moving_average_zero_window_raises_valueerror():
++    with pytest.raises(ValueError):
++        stats.moving_average([1, 2], 0)
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 491f56a..80a22c0 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -59,6 +59,14 @@ def test_moving_average():
+ def test_moving_average_full():
+     assert stats.moving_average([2, 4, 6], 3) == [4.0]
+ 
++def test_moving_average_zero_window():
++    with pytest.raises(ValueError):
++        stats.moving_average([1, 2], 0)
++
++def test_moving_average_negative_window():
++    with pytest.raises(ValueError):
++        stats.moving_average([1, 2], -1)
++
+ def test_clamp_inside():
+     assert stats.clamp(5, 0, 10) == 5
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..eb90842
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..4196eb5
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..f77d08f
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..5c23921
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..3fb7caa
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..d5f1277
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..07aea9a
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/stats.py b/toolkit/stats.py
+index 13f5b2d..98df0d4 100644
+--- a/toolkit/stats.py
++++ b/toolkit/stats.py
+@@ -59,7 +59,7 @@ def percentile(values, p):
+ 
+ 
+ def moving_average(values, window):
+-    if window < 0:
++    if window <= 0:
+         raise ValueError("window must be positive")
+     out = []
+     for i in range(len(values) - window + 1):

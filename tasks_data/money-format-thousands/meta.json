@@ -1,0 +1,18 @@
+{
+  "id": "money-format-thousands",
+  "kind": "bug",
+  "category": "format",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "easy",
+  "expr": "money.format_currency(1234.5)",
+  "expected": "'$1,234.50'",
+  "actual": {
+    "ok": true,
+    "repr": "'$1234.50'"
+  },
+  "failing_hidden_tests": [
+    "test_format_currency"
+  ],
+  "visible_tests": 83
+}

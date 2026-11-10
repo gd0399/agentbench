@@ -1,0 +1,25 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "The loop used range(1, month + 1), so it included the current month's full length and then added the day on top.",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

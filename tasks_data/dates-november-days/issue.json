@@ -1,0 +1,7 @@
+{
+  "number": 151,
+  "title": "November has 31 days",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`dates.days_in_month(2023, 11)` returns `31`. Expected: `30`.\n\nThanks for the great library!",
+  "author": "t-nakamura",
+  "labels": []
+}

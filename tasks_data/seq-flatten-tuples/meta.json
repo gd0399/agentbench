@@ -1,0 +1,18 @@
+{
+  "id": "seq-flatten-tuples",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.flatten([1, (2, 3)])",
+  "expected": "[1, 2, 3]",
+  "actual": {
+    "ok": true,
+    "repr": "[1, (2, 3)]"
+  },
+  "failing_hidden_tests": [
+    "test_flatten"
+  ],
+  "visible_tests": 83
+}

@@ -1,0 +1,18 @@
+{
+  "id": "stats-percentile-ceil",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "stats.percentile([15, 20, 35, 40, 50], 30)",
+  "expected": "20",
+  "actual": {
+    "ok": true,
+    "repr": "15"
+  },
+  "failing_hidden_tests": [
+    "test_percentile_rounds_up"
+  ],
+  "visible_tests": 83
+}

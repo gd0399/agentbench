@@ -1,0 +1,81 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "researcher unavailable: work directly from the issue",
+   "instructions": "The researcher is unavailable: reproduce and localise the bug yourself first."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "verifier",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 5,
+   "src": "verifier",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "researcher",
+   "error": "InjectedFailure: injected failure in researcher (call 2)",
+   "attempt": 2,
+   "recovered_by": "coder"
+  },
+  {
+   "agent": "reviewer",
+   "error": "InjectedFailure: injected failure in reviewer (call 2)",
+   "attempt": 2,
+   "recovered_by": "verifier"
+  }
+ ],
+ "trace": [
+  "researcher: FAILED -> coder",
+  "coder: ok",
+  "reviewer: FAILED -> verifier",
+  "verifier: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.title_case('the lord of the rings') returns 'the Lord of the Rings' instead of 'The Lord of the Rings'. The first word is lowercased because it is probably treated as a small word (e.g. 'the', 'of') that stays lowercase. The first word should always be capitalized, even when it is one of those small words. The fix is likely in toolkit/text.py, with a regression test added in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "degraded": true,
+  "suspected_files": [],
+  "root_cause": "researcher unavailable; not yet investigated"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier",
+  "attempt": 1
+ },
+ "resolution": null
+}

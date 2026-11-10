@@ -1,0 +1,251 @@
+{
+  "config": {
+    "tasks_dir": "tasks_data",
+    "out": "results/sonnet-f30",
+    "systems": [
+      "single",
+      "multi"
+    ],
+    "backend": "llm",
+    "model": "anthropic:claude-sonnet-5-5",
+    "fallback_models": [
+      "anthropic:claude-haiku-5-5"
+    ],
+    "router": "llm",
+    "limit": null,
+    "only": null,
+    "repeats": 1,
+    "workers": 10,
+    "fault_rate": 0.3,
+    "seed": 1,
+    "budget_usd": 1.0,
+    "max_coder_attempts": 3,
+    "max_agent_steps": 25,
+    "max_single_steps": 60
+  },
+  "n_rows": 132,
+  "n_tasks": 66,
+  "systems": {
+    "single": {
+      "n": 66,
+      "successes": 55,
+      "success_rate": 0.8333333333333334,
+      "success_ci95": [
+        0.7256918759242571,
+        0.9043051459080035
+      ],
+      "false_positive_pr_rate": 0.030303030303030304,
+      "cost_per_task_mean": 0.02472742424242424,
+      "cost_per_task_median": 0.027181999999999998,
+      "cost_per_success": 0.02967290909090909,
+      "total_cost": 1.63201,
+      "latency_mean_s": 25.61387878787879,
+      "latency_p50_s": 30.618000000000002,
+      "latency_p95_s": 36.230000000000004,
+      "llm_calls_mean": 3.9393939393939394,
+      "input_tokens_mean": 9289.545454545454,
+      "output_tokens_mean": 614.8333333333334,
+      "handoffs_mean": 0.0,
+      "injected_failures": 35,
+      "recovered_errors": 9,
+      "localization_acc": 0.8524590163934426,
+      "triage_acc": null,
+      "statuses": {
+        "pr_opened": 53,
+        "escalated": 9,
+        "invalid": 4
+      }
+    },
+    "multi": {
+      "n": 66,
+      "successes": 59,
+      "success_rate": 0.8939393939393939,
+      "success_ci95": [
+        0.7968747426118539,
+        0.9476671922808175
+      ],
+      "false_positive_pr_rate": 0.030303030303030304,
+      "cost_per_task_mean": 0.08940433333333334,
+      "cost_per_task_median": 0.084208,
+      "cost_per_success": 0.10001162711864407,
+      "total_cost": 5.900686,
+      "latency_mean_s": 68.35633333333334,
+      "latency_p50_s": 69.59100000000001,
+      "latency_p95_s": 115.2535,
+      "llm_calls_mean": 11.484848484848484,
+      "input_tokens_mean": 33035.19696969697,
+      "output_tokens_mean": 2333.3939393939395,
+      "handoffs_mean": 4.181818181818182,
+      "injected_failures": 131,
+      "recovered_errors": 64,
+      "localization_acc": 0.9344262295081968,
+      "triage_acc": 0.9545454545454546,
+      "statuses": {
+        "pr_opened": 61,
+        "escalated": 5
+      }
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "single": {
+        "n": 23,
+        "success_rate": 0.8260869565217391
+      },
+      "multi": {
+        "n": 23,
+        "success_rate": 1.0
+      }
+    },
+    "hard": {
+      "single": {
+        "n": 38,
+        "success_rate": 0.8421052631578947
+      },
+      "multi": {
+        "n": 38,
+        "success_rate": 0.9473684210526315
+      }
+    },
+    "n/a": {
+      "single": {
+        "n": 5,
+        "success_rate": 0.8
+      },
+      "multi": {
+        "n": 5,
+        "success_rate": 0.0
+      }
+    }
+  },
+  "by_category": {
+    "arithmetic": {
+      "single": {
+        "n": 9,
+        "success_rate": 1.0
+      },
+      "multi": {
+        "n": 9,
+        "success_rate": 1.0
+      }
+    },
+    "cross-module": {
+      "single": {
+        "n": 4,
+        "success_rate": 0.75
+      },
+      "multi": {
+        "n": 4,
+        "success_rate": 0.75
+      }
+    },
+    "edge-case": {
+      "single": {
+        "n": 9,
+        "success_rate": 0.8888888888888888
+      },
+      "multi": {
+        "n": 9,
+        "success_rate": 1.0
+      }
+    },
+    "format": {
+      "single": {
+        "n": 2,
+        "success_rate": 0.5
+      },
+      "multi": {
+        "n": 2,
+        "success_rate": 1.0
+      }
+    },
+    "hang": {
+      "single": {
+        "n": 1,
+        "success_rate": 1.0
+      },
+      "multi": {
+        "n": 1,
+        "success_rate": 1.0
+      }
+    },
+    "invalid": {
+      "single": {
+        "n": 5,
+        "success_rate": 0.8
+      },
+      "multi": {
+        "n": 5,
+        "success_rate": 0.0
+      }
+    },
+    "logic": {
+      "single": {
+        "n": 22,
+        "success_rate": 0.7727272727272727
+      },
+      "multi": {
+        "n": 22,
+        "success_rate": 0.9545454545454546
+      }
+    },
+    "off-by-one": {
+      "single": {
+        "n": 10,
+        "success_rate": 0.8
+      },
+      "multi": {
+        "n": 10,
+        "success_rate": 1.0
+      }
+    },
+    "operator": {
+      "single": {
+        "n": 4,
+        "success_rate": 1.0
+      },
+      "multi": {
+        "n": 4,
+        "success_rate": 1.0
+      }
+    }
+  },
+  "by_kind": {
+    "bug": {
+      "single": {
+        "n": 61,
+        "success_rate": 0.8360655737704918
+      },
+      "multi": {
+        "n": 61,
+        "success_rate": 0.9672131147540983
+      }
+    },
+    "invalid": {
+      "single": {
+        "n": 5,
+        "success_rate": 0.8
+      },
+      "multi": {
+        "n": 5,
+        "success_rate": 0.0
+      }
+    }
+  },
+  "paired": {
+    "pairs": 66,
+    "single_only": 5,
+    "multi_only": 9,
+    "both": 50,
+    "neither": 2,
+    "success_diff": 0.06060606060606061,
+    "success_diff_ci95": [
+      -0.045454545454545456,
+      0.16666666666666666
+    ],
+    "mcnemar_p": 0.4239501953125,
+    "cost_ratio": 3.6155942671919905,
+    "latency_ratio_p50": 2.272878698804625
+  },
+  "harness_errors": []
+}

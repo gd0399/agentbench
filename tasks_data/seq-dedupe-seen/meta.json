@@ -1,0 +1,18 @@
+{
+  "id": "seq-dedupe-seen",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.dedupe([3, 1, 3, 2, 1])",
+  "expected": "[3, 1, 2]",
+  "actual": {
+    "ok": true,
+    "repr": "[3, 1, 3, 2, 1]"
+  },
+  "failing_hidden_tests": [
+    "test_dedupe_order"
+  ],
+  "visible_tests": 83
+}

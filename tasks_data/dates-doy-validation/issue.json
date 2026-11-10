@@ -1,0 +1,7 @@
+{
+  "number": 156,
+  "title": "day_of_year accepts Feb 29 in non-leap years",
+  "body": "### What happened?\n`dates.day_of_year(2023, 2, 29)` returns `60`.\n\n### What did you expect?\nIt should raise `ValueError` (expected: `raise ValueError`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

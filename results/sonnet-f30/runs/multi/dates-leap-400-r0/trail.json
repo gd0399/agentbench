@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "dates.is_leap_year(2000) returns False but should return True. Years divisible by 400 are leap years, even though they are divisible by 100. The leap-year logic in toolkit/dates.py probably omits the divisible-by-400 exception. Fix the rule: (y%4==0 and y%100!=0) or y%400==0. Add a regression test for 2000, plus 1900 (False) and 2024 (True)."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 5, is_leap_year: `year % 4 == 0 and (year % 100 != 0 or year % 400 != 0)`. The last clause should be `year % 400 == 0`, not `!= 0`. As written, any century year not divisible by 400 (1900, 2100) wrongly returns True, and every year divisible by 400 (2000, 2400) wrongly returns False. The triage guess, that the 400 exception is omitted, is slightly off: the exception is present but inverted. The issue also misses the 1900/2100 -> True side effect. Correct: `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. No existing tests or docs conflict: the 2024/2023 tests pass either way.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=2 failed=4 errors=0\nFF..FF                                                                   [100%]\n=================================== FAILURES ===================================\n_________________________ test_is_leap_year[2000-True] _________________________\n\nyear = 2000, expected = True\n\n    @pytest.mark.parametrize(\"year,expected\", [(2000, True), (1900, False), (2024, True), (2023, False), (2100, False), (2400, True)])\n    def test_is_leap_year(year, expected):\n>       assert dates.is_leap_year(year) is expected\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7f33e2a6a660>(2000)\nE        +    where <function is_leap_year at 0x7f33e2a6a660> = dates.is_leap_year\n\ntests/test_issue_repro.py:7: AssertionError\n________________________ test_is_leap_year[1900-False] _________________________\n\nyear = 1900, expected = False\n\n    @pytest.mark.parametrize(\"year,expected\", [(2000, True), (1900, False), (2024, True), (2023, False), (2100, False), (2400, True)])\n    def test_is_leap_year(year, expected):\n>       assert dates.is_leap_year(year) is expected\nE       assert True is False\nE        +  where True = <function is_leap_year at 0x7f33e2a6a660>(1900)\nE        +    where <function is_leap_year at 0x7f33e2a6a660> = dates.is_leap_year\n\ntests/test_issue_repro.py:7: AssertionError\n________________________ test_is_leap_year[2100-False] _________________________\n\nyear = 2100, expected = False\n\n    @pytest.mark.parametrize(\"year,expected\", [(2000,"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The one-character change (`year % 400 != 0` to `year % 400 == 0`) fixes the root cause. I checked `is_leap_year` against `calendar.isleap` for years 1 to 2999 and every year matched. All 89 tests pass. No existing tests were modified. The new regression test in tests/test_issue_repro.py covers 2000, 1900, 2100 and 2400. Before merging, drop the committed `__pycache__/*.pyc` files from the diff and add `__pycache__/` to .gitignore. They are build artifacts and shouldn't be in the patch. You could also fold the regression test into tests/test_toolkit.py instead of keeping a separate \"issue_repro\" file.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

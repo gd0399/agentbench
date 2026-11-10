@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause in toolkit/report.py line 19. The fix is small and well specified, and no patch exists yet.",
+   "instructions": "In toolkit/report.py, function top_words (line ~19), change the sort key from `(counts[w], w)` to `(-counts[w], w)`. This sorts by count descending and keeps the alphabetical tie-break. Do NOT use reverse=True, because that would break the existing test test_top_words_tie_alpha ('z y x' -> ['x','y']). Keep tests/test_issue_repro.py::test_top_words_most_common as the regression test ('b a b c a b', 2 -> ['b','a']). Run the full test suite and confirm everything passes. Don't touch text.py or stats.py. Make no unrelated changes."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.top_words('b a b c a b', 2) returns ['c', 'a'], the least common words, instead of ['b', 'a']. The sort order or selection in top_words is probably inverted (ascending instead of descending by count). The function may also delegate to text.py or stats.py, so check those too. Next step: have the researcher inspect toolkit/report.py and confirm the cause, then have the coder fix it and add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 19 in top_words: `sorted(counts, key=lambda w: (counts[w], w))` sorts by count ascending, so ranked[:n] returns the least common words. It should sort by count descending and keep alphabetical tie-break, e.g. key=lambda w: (-counts[w], w). The existing test test_top_words_tie_alpha ('z y x' -> ['x','y']) requires alphabetical tie-breaking, so don't use reverse=True, which would break it. text.py and stats.py are not involved.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=1 failed=1 errors=0\nF.                                                                       [100%]\n=================================== FAILURES ===================================\n__________________________ test_top_words_most_common __________________________\n\n    def test_top_words_most_common():\n>       assert report.top_words('b a b c a b', 2) == ['b', 'a']\nE       AssertionError: assert ['c', 'a'] == ['b', 'a']\nE         \nE         At index 0 diff: 'c' != 'b'\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_top_words_most_common - AssertionError...\n1 failed, 1 passed in 0.32s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was the sort key `(counts[w], w)`, which sorts ascending by count. Changing it to `(-counts[w], w)` gives count descending with an alphabetical tie-break. That fixes the general ordering, not just the repro input. The existing tie-break test (`test_top_words_tie_alpha`) still passes, and all 85 tests pass. The change is one line, and no existing tests were modified. The new tests in `tests/test_issue_repro.py` are reasonable. One of them duplicates the existing tie-break test, which is harmless.\n\nBefore merging, drop the `__pycache__/*.pyc` binaries from the diff. They are test-run artifacts, not part of the fix. Adding a `.gitignore` entry for `__pycache__` would stop this happening again. The code change itself is fine.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,7 @@
+{
+  "number": 161,
+  "title": "invoice tax is computed before the discount",
+  "body": "**Describe the bug**\nCalling `report.invoice_total([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1)` returns `25.0`, but it should return `24.75`.\n\n**To reproduce**\n```python\nfrom toolkit import report\nprint(report.invoice_total([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1))\n```\n\n**Expected behaviour**\nExpected: `24.75`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "priya-r",
+  "labels": []
+}

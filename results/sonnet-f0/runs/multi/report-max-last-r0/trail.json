@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Root cause identified and reproduced: toolkit/report.py line 10 uses values[-1] instead of max(values). No conflicts with existing tests. Ready for a fix.",
+   "instructions": "In toolkit/report.py, summarize() at line 10, replace `\"max\": values[-1]` with `\"max\": max(values)`. Don't touch mean/median or stats.py. Make sure tests/test_issue_repro.py (test_summarize_unsorted_max, input [3, 9, 2] expecting max 9) passes, and keep it as the regression test with unsorted input. Run the full test suite to confirm nothing else breaks, including the existing test_summarize. Handle empty input the same way it was handled before; don't change that behavior."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.summarize() returns the wrong 'max' for unsorted input. For [3, 9, 2] it returns 2 instead of 9. It likely takes the last element instead of computing the true maximum. The mean and median in the example look correct. The fix is probably in toolkit/report.py, or in a helper in toolkit/stats.py if summarize delegates to one. Add a regression test with unsorted input."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 10, in summarize(): `\"max\": values[-1]` returns the last element, not the maximum. It is only correct for sorted input. The fix is `max(values)`. The triage's suggestion to look in stats.py is not needed, because summarize doesn't delegate for max. Mean and median are correct. The existing test test_summarize uses sorted input, so it doesn't catch this. Repro test: tests/test_issue_repro.py.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_summarize_unsorted_max __________________________\n\n    def test_summarize_unsorted_max():\n>       assert report.summarize([3, 9, 2]) == {'count': 3, 'mean': 4.67, 'median': 3, 'max': 9}\nE       AssertionError: assert {'count': 3, ...: 3, 'max': 2} == {'count': 3, ...: 3, 'max': 9}\nE         \nE         Omitting 3 identical items, use -vv to show\nE         Differing items:\nE         {'max': 2} != {'max': 9}\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_summarize_unsorted_max - AssertionErro...\n1 failed in 0.13s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was that `summarize` assumed sorted input by using `values[-1]`. Replacing it with `max(values)` fixes that for any ordering. It isn't tailored to the issue's example input.\n\n- The full suite passes (84 tests).\n- I probed `[3,9,2]`, all-negative input, a single element and empty input. All give correct results, and empty input still raises the same `ValueError` from `stats.mean`.\n- `stats.median` sorts a copy, so it doesn't mutate the input or depend on order.\n- No other `[-1]` indexing exists in the repo, so there are no sibling instances of this bug.\n- No existing tests were modified. The new regression test in `tests/test_issue_repro.py` is appropriate. You could fold it into `test_toolkit.py` to match the existing layout.\n\nNit: the diff includes committed `__pycache__/*.pyc` files. Please drop them and add `__pycache__/` to `.gitignore` before merging. They don't affect behaviour.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

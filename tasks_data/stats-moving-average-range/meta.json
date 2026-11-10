@@ -1,0 +1,19 @@
+{
+  "id": "stats-moving-average-range",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "stats.moving_average([2, 4, 6], 3)",
+  "expected": "[4.0]",
+  "actual": {
+    "ok": true,
+    "repr": "[]"
+  },
+  "failing_hidden_tests": [
+    "test_moving_average",
+    "test_moving_average_full"
+  ],
+  "visible_tests": 82
+}

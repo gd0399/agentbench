@@ -1,0 +1,7 @@
+{
+  "number": 160,
+  "title": "top_words returns one word too few",
+  "body": "**Describe the bug**\nCalling `report.top_words('z y x', 2)` returns `['x']`, but it should return `['x', 'y']`.\n\n**To reproduce**\n```python\nfrom toolkit import report\nprint(report.top_words('z y x', 2))\n```\n\n**Expected behaviour**\nExpected: `['x', 'y']`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "jchen42",
+  "labels": []
+}

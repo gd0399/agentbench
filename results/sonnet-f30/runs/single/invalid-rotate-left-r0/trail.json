@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "No bug. The reporter expected left rotation, but the function is intentionally a right rotation.",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

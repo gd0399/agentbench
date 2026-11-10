@@ -1,0 +1,34 @@
+{
+  "id": "seq-bsearch-hang",
+  "kind": "bug",
+  "category": "hang",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.binary_search([1, 3, 5], 4)",
+  "expected": "-1",
+  "actual": {
+    "ok": false,
+    "exc": "Timeout"
+  },
+  "failing_hidden_tests": [
+    "test_chunk",
+    "test_chunk_exact",
+    "test_chunk_bad",
+    "test_flatten",
+    "test_dedupe_order",
+    "test_rotate",
+    "test_rotate_zero",
+    "test_rotate_wrap",
+    "test_rotate_empty",
+    "test_sliding_window",
+    "test_binary_search_found",
+    "test_binary_search_edges",
+    "test_binary_search_missing",
+    "test_merge_sorted",
+    "test_merge_sorted_stable",
+    "test_last_n",
+    "test_last_n_zero"
+  ],
+  "visible_tests": 67
+}

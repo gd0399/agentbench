@@ -1,0 +1,19 @@
+{
+  "id": "stats-clamp-swapped",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "stats.clamp(5, 0, 10)",
+  "expected": "5",
+  "actual": {
+    "ok": true,
+    "repr": "0"
+  },
+  "failing_hidden_tests": [
+    "test_clamp_high",
+    "test_clamp_inside"
+  ],
+  "visible_tests": 82
+}

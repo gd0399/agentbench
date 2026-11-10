@@ -1,0 +1,19 @@
+{
+  "id": "seq-chunk-last",
+  "kind": "bug",
+  "category": "cross-module",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "report.pages(list(range(5)), 2)",
+  "expected": "3",
+  "actual": {
+    "ok": true,
+    "repr": "2"
+  },
+  "failing_hidden_tests": [
+    "test_chunk",
+    "test_pages"
+  ],
+  "visible_tests": 82
+}

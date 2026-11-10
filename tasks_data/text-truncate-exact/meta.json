@@ -1,0 +1,18 @@
+{
+  "id": "text-truncate-exact",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "easy",
+  "expr": "text.truncate('hello', 5)",
+  "expected": "'hello'",
+  "actual": {
+    "ok": true,
+    "repr": "'he...'"
+  },
+  "failing_hidden_tests": [
+    "test_truncate_exact"
+  ],
+  "visible_tests": 83
+}

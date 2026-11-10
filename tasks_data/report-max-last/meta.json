@@ -1,0 +1,18 @@
+{
+  "id": "report-max-last",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/report.py",
+  "component": "report",
+  "difficulty": "hard",
+  "expr": "report.summarize([3, 9, 2])",
+  "expected": "{'count': 3, 'mean': 4.67, 'median': 3, 'max': 9}",
+  "actual": {
+    "ok": true,
+    "repr": "{'count': 3, 'mean': 4.67, 'median': 3, 'max': 2}"
+  },
+  "failing_hidden_tests": [
+    "test_summarize_unsorted"
+  ],
+  "visible_tests": 83
+}

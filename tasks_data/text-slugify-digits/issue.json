@@ -1,0 +1,7 @@
+{
+  "number": 116,
+  "title": "slugify strips numbers",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.slugify('Top 10 Tips')` returns `'top-tips'`. Expected: `'top-10-tips'`.\n\nThanks for the great library!",
+  "author": "mlopez",
+  "labels": []
+}

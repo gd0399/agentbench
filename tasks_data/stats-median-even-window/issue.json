@@ -1,0 +1,7 @@
+{
+  "number": 102,
+  "title": "summarize() reports the wrong median for even-length data",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`report.summarize([1, 2, 3, 4])` returns `{'count': 4, 'mean': 2.5, 'median': 3.5, 'max': 4}`. Expected: `{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}`.\n\nThanks for the great library!",
+  "author": "octocat",
+  "labels": []
+}

@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: toolkit/stats.py line 7 divides by len(values) - 1 instead of len(values). There is no conflict with existing tests, so the coder can write the fix.",
+   "instructions": "In toolkit/stats.py line 7, change mean() from `sum(values) / (len(values) - 1)` to `sum(values) / len(values)`. Keep the existing empty-list behavior, which test_mean_empty covers. Don't change that behavior. Make tests/test_issue_repro.py::test_mean_basic pass. Add a regression test to tests/test_toolkit.py: mean([1,2,3,4]) == 2.5, plus a single-element case such as mean([5]) == 5. Then check variance() in stats.py, which calls mean(), and the mean in toolkit/report.py. Both should now give correct results. Run the full test suite and report the results. Keep the diff minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "stats.mean([1, 2, 3, 4]) returns 3.3333333333333335 instead of 2.5. The result looks like the sum (10) divided by 3 instead of 4. That points to an off-by-one in the divisor, or a wrong element count, in toolkit/stats.py. Next step: the researcher or coder should inspect mean() in toolkit/stats.py and fix the divisor. Then add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/stats.py line 7, in mean(): `return sum(values) / (len(values) - 1)` divides by n-1 instead of n (sample-variance style off-by-one). Should be `sum(values) / len(values)`. This also corrupts variance() (line 41 uses mean()) and report.py's mean. Note that a single-element list would raise ZeroDivisionError. No existing test or docs contradict the expected behaviour (only test_mean_empty exists).",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_mean_basic ________________________________\n\n    def test_mean_basic():\n>       assert stats.mean([1, 2, 3, 4]) == 2.5\nE       assert 3.3333333333333335 == 2.5\nE        +  where 3.3333333333333335 = <function mean at 0x7fd086fd6660>([1, 2, 3, 4])\nE        +    where <function mean at 0x7fd086fd6660> = stats.mean\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_mean_basic - assert 3.3333333333333335...\n1 failed in 0.28s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was the `len(values) - 1` divisor in `mean()`, and the patch changes it to `len(values)`. I ran the suite and all 81 tests pass. The only other caller of `mean()` is `variance()`, which already divides by `n - 1` or `n` itself, so it is unaffected. `report.summarize` now gets the correct mean. The existing `test_mean_empty` is unchanged, and no existing tests were weakened. The new tests check the issue's input and a single-element list.\n\nTwo nits to clean up before merging:\n- The diff includes `__pycache__/*.pyc` files. These are test-run artifacts and should be dropped from the commit, or `__pycache__/` added to `.gitignore`.\n- `tests/test_issue_repro.py` repeats `test_mean_basic`, which is already in `tests/test_toolkit.py`. Delete the duplicate file.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,7 @@
+{
+  "number": 104,
+  "title": "median() crashes with TypeError",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.median([3, 1, 2])` raises `TypeError`. Expected: `2`.\n\nThanks for the great library!",
+  "author": "octocat",
+  "labels": []
+}

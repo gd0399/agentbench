@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.moving_average drops the last window (off-by-one). moving_average([2, 4, 6], 3) returns [] but should return [4.0]. The window loop likely stops one iteration early, e.g. range(len(xs) - window) instead of range(len(xs) - window + 1). Reported from production use."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 65, in moving_average: `for i in range(len(values) - window):` is off by one and omits the final window. It should be `range(len(values) - window + 1)`. For [2,4,6] with window 3 the range is empty, so the result is []. No existing test or docs contradict the fix; the only existing test covers window<=0 raising ValueError.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_______________________ test_moving_average_last_window ________________________\n\n    def test_moving_average_last_window():\n>       assert stats.moving_average([2, 4, 6], 3) == [4.0]\nE       assert [] == [4.0]\nE         \nE         Right contains one more item: 4.0\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n_____________________ test_moving_average_multiple_windows _____________________\n\n    def test_moving_average_multiple_windows():\n>       assert stats.moving_average([1, 2, 3, 4], 2) == [1.5, 2.5, 3.5]\nE       assert [1.5, 2.5] == [1.5, 2.5, 3.5]\nE         \nE         Right contains one more item: 3.5\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_moving_average_last_window - assert []...\nFAILED tests/test_issue_repro.py::test_moving_average_multiple_windows - asse...\n2 failed in 0.35s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line change to `range(len(values) - window + 1)` fixes the root cause. The loop was missing the last window. I checked these cases:\n- `[2,4,6]` with window 3 gives `[4.0]`.\n- A window larger than the input returns `[]`.\n- An empty input returns `[]`.\n- Window 1 works.\n- The existing tests still pass (84 passed).\n\nThe new regression tests are reasonable, and no existing tests were changed.\n\nBefore merging, drop the committed `__pycache__/*.pyc` files from the patch and add a `.gitignore` for them. They are build artifacts and shouldn't be in the diff. This is cleanup only and doesn't affect the fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,7 @@
+{
+  "number": 138,
+  "title": "merge_sorted raises IndexError",
+  "body": "**Describe the bug**\nCalling `seq.merge_sorted([1], [2, 3])` raises `IndexError`, but it should return `[1, 2, 3]`.\n\n**To reproduce**\n```python\nfrom toolkit import seq\nprint(seq.merge_sorted([1], [2, 3]))\n```\n\n**Expected behaviour**\nExpected: `[1, 2, 3]`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "kwame-a",
+  "labels": []
+}

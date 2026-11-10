@@ -1,0 +1,7 @@
+{
+  "number": 146,
+  "title": "negative amounts get a double minus sign",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`money.format_currency(-5)` returns `'-$-5.00'`. Expected: `'-$5.00'`.\n\nThanks for the great library!",
+  "author": "mlopez",
+  "labels": []
+}

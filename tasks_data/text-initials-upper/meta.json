@@ -1,0 +1,18 @@
+{
+  "id": "text-initials-upper",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.initials('ada lovelace')",
+  "expected": "'AL'",
+  "actual": {
+    "ok": true,
+    "repr": "'al'"
+  },
+  "failing_hidden_tests": [
+    "test_initials"
+  ],
+  "visible_tests": 83
+}

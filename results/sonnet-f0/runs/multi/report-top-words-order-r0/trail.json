@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause in toolkit/report.py line 19: the sort key orders by ascending count. The fix is small and well-defined, and no test conflicts with it.",
+   "instructions": "In toolkit/report.py, function top_words (line ~19), change the sort key from `(counts[w], w)` to `(-counts[w], w)`. That gives descending count with an alphabetical tie-break. Don't touch toolkit/text.py or toolkit/stats.py. Run tests/test_issue_repro.py and the full test suite. The repro test must pass, and the existing test_top_words_tie_alpha ('z y x' -> ['x','y']) must still pass. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.top_words('b a b c a b', 2) returns ['c', 'a'] (the least common words) instead of ['b', 'a']. The sort order or selection is probably inverted, for example ascending instead of descending, or a wrong slice. The function may also delegate to a helper in toolkit/text.py or toolkit/stats.py, so check there too."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 19 in top_words: `ranked = sorted(counts, key=lambda w: (counts[w], w))` sorts by count ascending, so ranked[:n] gives the least common words. It should sort by descending count with alphabetical tie-break, e.g. key=lambda w: (-counts[w], w). The existing test test_top_words_tie_alpha ('z y x' -> ['x','y']) still holds with that key. The helpers in text.py and stats.py are not involved.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________ test_top_words_most_common_first _______________________\n\n    def test_top_words_most_common_first():\n>       assert report.top_words('b a b c a b', 2) == ['b', 'a']\nE       AssertionError: assert ['c', 'a'] == ['b', 'a']\nE         \nE         At index 0 diff: 'c' != 'b'\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_top_words_most_common_first - Assertio...\n1 failed in 0.10s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was the ascending sort on count. Changing the key to (-counts[w], w) puts the most common words first and keeps the alphabetical tie-break. The one-line change is minimal. All 84 tests pass, including the existing test_top_words_tie_alpha. The new regression test matches the issue's repro, and no existing tests were modified.\n\nBefore merging, drop the committed __pycache__/*.pyc files from the diff. They are artifacts of running the tests, and the repo has no .gitignore. Adding a .gitignore for them would also be fine.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,18 @@
+{
+  "id": "stats-variance-guard",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "easy",
+  "expr": "stats.variance([1, 2, 3])",
+  "expected": "1.0",
+  "actual": {
+    "ok": false,
+    "exc": "ValueError"
+  },
+  "failing_hidden_tests": [
+    "test_variance_sample"
+  ],
+  "visible_tests": 83
+}

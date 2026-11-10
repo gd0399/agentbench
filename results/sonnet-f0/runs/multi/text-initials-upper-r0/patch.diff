@@ -1,0 +1,33 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 95d9766..6aabc23 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -260,3 +260,7 @@ def test_headline():
+ def test_pages():
+     assert report.pages(list(range(10)), 3) == 4
+ 
++
++def test_initials_capitalised():
++    assert text.initials('ada lovelace') == 'AL'
++    assert text.initials('ada  byron lovelace') == 'ABL'
+diff --git a/toolkit/text.py b/toolkit/text.py
+index 283e41a..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -42,7 +42,7 @@ def count_vowels(s):
+ 
+ def initials(name):
+     parts = [p for p in name.split() if p]
+-    return "".join(p[0] for p in parts)
++    return "".join(p[0].upper() for p in parts)
+ 
+ 
+ def camel_to_snake(s):

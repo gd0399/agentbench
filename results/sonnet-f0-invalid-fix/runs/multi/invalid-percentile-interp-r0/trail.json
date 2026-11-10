@@ -1,0 +1,42 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "close_invalid",
+   "reason": "The researcher reproduced the report, but the behaviour is documented. `percentile` is documented as \"Nearest-rank percentile\", and the tests in tests/test_toolkit.py lines 40-50 pin nearest-rank results. Switching to linear interpolation would break those tests and change the documented contract, so this is working as designed.",
+   "instructions": "Close the issue as invalid, working as documented. Explain that `stats.percentile` uses the nearest-rank method, so [1,2,3,4] at p=50 gives 2. numpy's default is linear interpolation, which is a different method. Point the reporter to the docstring at toolkit/stats.py:48-58. Suggest that a `method=\"linear\"` option or a separate `percentile_linear` function could be filed as a new feature request, with nearest-rank kept as the default. Do not merge tests/test_issue_repro.py, because it asserts behaviour that contradicts the documented contract."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: invalid"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.percentile does not use linear interpolation between neighbouring ranks. percentile([1, 2, 3, 4], 50) returns 2 but should return 2.5, which matches numpy's default linear method. The fix is likely in toolkit/stats.py. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "tests/test_toolkit.py"
+  ],
+  "root_cause": "The behaviour is by design, so this is probably not a bug. toolkit/stats.py:48-58 `percentile` is documented as \"Nearest-rank percentile\". It computes rank = ceil(p*n/100) and returns ordered[rank-1] with no interpolation. For [1,2,3,4] at p=50, rank=2 and the result is 2. The repro test tests/test_issue_repro.py fails with 2 != 2.5. The reporter wants numpy's default linear interpolation, which is a different method. The existing tests in tests/test_toolkit.py (lines 40-50) pin nearest-rank results. `percentile([15,20,35,40,50], 40) == 20` would be 29 under linear interpolation. `percentile([15,20,35,40,50], 30) == 20` (named \"rounds_up\") would be 23. Switching to linear interpolation would break those tests and change the documented contract. It would be better to add a separate option or function, for example `method=\"linear\"` or `percentile_linear`, and keep nearest-rank as the default. Alternatively, close the issue as working as documented.",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_percentile_interpolates _________________________\n\n    def test_percentile_interpolates():\n>       assert stats.percentile([1, 2, 3, 4], 50) == 2.5\nE       assert 2 == 2.5\nE        +  where 2 = <function percentile at 0x7fc52b3968e0>([1, 2, 3, 4], 50)\nE        +    where <function percentile at 0x7fc52b3968e0> = stats.percentile\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_percentile_interpolates - assert 2 == 2.5\n1 failed in 0.06s\n"
+ },
+ "review": null,
+ "resolution": "reported behaviour is intended"
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>agentbench — single vs multi-agent</title><style>
+.viz-root{color-scheme:light;--surface-1:#fcfcfb;--text-primary:#0b0b0b;--text-secondary:#52514e;--rule:#e4e3df;--series-single:#2a78d6;--series-multi:#eb6834;}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz-root{color-scheme:dark;--surface-1:#1a1a19;--text-primary:#f0efec;--text-secondary:#c3c2b7;--rule:#3a3a37;--series-single:#3987e5;--series-multi:#d95926;}}
+body{margin:0} .viz-root{background:var(--surface-1);color:var(--text-primary);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;padding:32px 20px}
+main{max-width:1100px;margin:0 auto} h1{font-size:26px;margin:0 0 4px} .sub{color:var(--text-secondary);margin:0 0 20px}
+.banner{border:1px solid var(--rule);border-left:4px solid var(--text-secondary);padding:10px 14px;border-radius:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:18px;margin:18px 0}
+.chart{margin:0;border:1px solid var(--rule);border-radius:10px;padding:12px 14px} figcaption{font-weight:600;margin-bottom:6px}
+svg{width:100%;height:auto;overflow:visible} .axis{stroke:var(--rule)} .lbl,.val{fill:var(--text-secondary);font-size:13px}
+.val{fill:var(--text-primary);font-variant-numeric:tabular-nums} .ci{stroke:var(--text-primary);stroke-width:1.5;fill:none}
+.hit{fill:transparent} .mark:hover .hit{fill:var(--rule);opacity:.5}
+.legend{display:flex;gap:18px;color:var(--text-secondary)} .key i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+pre{white-space:pre-wrap;border:1px solid var(--rule);border-radius:10px;padding:16px;font:13px/1.45 ui-monospace,Menlo,monospace;overflow:auto}
+</style></head><body><div class="viz-root"><main>
+<h1>Single agent vs. supervisor multi-agent</h1>
+<p class="sub">66 GitHub-style issues · 132 graded runs · backend <b>llm</b>
+· model <b>anthropic:claude-sonnet-5-5</b> · injected fault rate 30%</p>
+<div class="legend"><span class="key"><i style="background:var(--series-single)"></i>Single agent</span><span class="key"><i style="background:var(--series-multi)"></i>Multi-agent (supervisor)</span></div>
+<div class="grid"><figure class="chart"><figcaption>Success rate (95% Wilson CI)</figcaption><svg viewBox="0 0 560 104" role="img" aria-label="Success rate (95% Wilson CI)"><line x1="190" x2="190" y1="4" y2="96" class="axis"/><g class="mark"><title>Single agent: 83.3%</title><rect x="184" y="6" width="370" height="38" class="hit"/><text x="180" y="25" text-anchor="end" class="lbl">Single agent</text><path d="M190,12 h229.33333333333334 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-229.33333333333334 z" fill="var(--series-single)"/><path d="M393.193725258792,24 H443.205440854241 M393.193725258792,19 v10 M443.205440854241,19 v10" class="ci"/><text x="451.205440854241" y="28" class="val">83.3%</text></g><g class="mark"><title>Multi-agent (supervisor): 89.4%</title><rect x="184" y="50" width="370" height="38" class="hit"/><text x="180" y="69" text-anchor="end" class="lbl">Multi-agent (supervisor)</text><path d="M190,56 h246.3030303030303 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-246.3030303030303 z" fill="var(--series-multi)"/><path d="M413.1249279313191,68 H455.3468138386289 M413.1249279313191,63 v10 M455.3468138386289,63 v10" class="ci"/><text x="463.3468138386289" y="72" class="val">89.4%</text></g></svg></figure><figure class="chart"><figcaption>Cost per task (mean, USD)</figcaption><svg viewBox="0 0 560 104" role="img" aria-label="Cost per task (mean, USD)"><line x1="190" x2="190" y1="4" y2="96" class="axis"/><g class="mark"><title>Single agent: $0.0247</title><rect x="184" y="6" width="370" height="38" class="hit"/><text x="180" y="25" text-anchor="end" class="lbl">Single agent</text><path d="M190,12 h73.44231772373584 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-73.44231772373584 z" fill="var(--series-single)"/><text x="275.44231772373587" y="28" class="val">$0.0247</text></g><g class="mark"><title>Multi-agent (supervisor): $0.0894</title><rect x="184" y="50" width="370" height="38" class="hit"/><text x="180" y="69" text-anchor="end" class="lbl">Multi-agent (supervisor)</text><path d="M190,56 h276.0 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-276.0 z" fill="var(--series-multi)"/><text x="478.0" y="72" class="val">$0.0894</text></g></svg></figure><figure class="chart"><figcaption>Latency per task (p50, seconds)</figcaption><svg viewBox="0 0 560 104" role="img" aria-label="Latency per task (p50, seconds)"><line x1="190" x2="190" y1="4" y2="96" class="axis"/><g class="mark"><title>Single agent: 30.6s</title><rect x="184" y="6" width="370" height="38" class="hit"/><text x="180" y="25" text-anchor="end" class="lbl">Single agent</text><path d="M190,12 h119.19179204207441 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-119.19179204207441 z" fill="var(--series-single)"/><text x="321.19179204207444" y="28" class="val">30.6s</text></g><g class="mark"><title>Multi-agent (supervisor): 69.6s</title><rect x="184" y="50" width="370" height="38" class="hit"/><text x="180" y="69" text-anchor="end" class="lbl">Multi-agent (supervisor)</text><path d="M190,56 h276.0 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-276.0 z" fill="var(--series-multi)"/><text x="478.0" y="72" class="val">69.6s</text></g></svg></figure><figure class="chart"><figcaption>Wrong PRs opened (share of tasks)</figcaption><svg viewBox="0 0 560 104" role="img" aria-label="Wrong PRs opened (share of tasks)"><line x1="190" x2="190" y1="4" y2="96" class="axis"/><g class="mark"><title>Single agent: 3.0%</title><rect x="184" y="6" width="370" height="38" class="hit"/><text x="180" y="25" text-anchor="end" class="lbl">Single agent</text><path d="M190,12 h165.6969696969697 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-165.6969696969697 z" fill="var(--series-single)"/><text x="367.6969696969697" y="28" class="val">3.0%</text></g><g class="mark"><title>Multi-agent (supervisor): 3.0%</title><rect x="184" y="50" width="370" height="38" class="hit"/><text x="180" y="69" text-anchor="end" class="lbl">Multi-agent (supervisor)</text><path d="M190,56 h165.6969696969697 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-165.6969696969697 z" fill="var(--series-multi)"/><text x="367.6969696969697" y="72" class="val">3.0%</text></g></svg></figure></div>
+<h2>Full results (table view)</h2><pre># Benchmark results — 66 tasks, 132 runs
+
+backend: `llm` · model: `anthropic:claude-sonnet-5-5` (fallbacks: anthropic:claude-haiku-5-5) · router: `llm` · injected fault rate: 30% · repeats: 1
+
+| metric | Single agent | Multi-agent (supervisor) |
+|---|---|---|
+| success rate | 83.3% (72.6%–90.4%) | 89.4% (79.7%–94.8%) |
+| wrong PRs opened (false positives) | 3.0% | 3.0% |
+| cost / task (mean) | $0.0247 | $0.0894 |
+| cost / successful task | $0.0297 | $0.1000 |
+| latency p50 / p95 | 30.6s / 36.2s | 69.6s / 115.3s |
+| LLM calls / task | 3.9 | 11.5 |
+| tokens in / out per task | 9,290 / 615 | 33,035 / 2,333 |
+| handoffs / task | 0.0 | 4.2 |
+| fault localisation (top-3 file) | 85.2% | 93.4% |
+| triage component accuracy | — | 95.5% |
+| injected failures / recovered errors | 35 / 9 | 131 / 64 |
+| outcomes | escalated: 9, invalid: 4, pr_opened: 53 | escalated: 5, pr_opened: 61 |
+
+## Paired comparison (same tasks)
+
+- tasks solved by both: 50, neither: 2, only single: 5, only multi: 9
+- success difference (multi − single): +6.1 pp, bootstrap 95% CI [-4.5, +16.7] pp, exact McNemar p = 0.424
+- cost ratio multi/single: 3.62×
+- median latency ratio multi/single: 2.27×
+
+## By difficulty
+
+| group | n | Single agent | Multi-agent (supervisor) |
+|---|---|---|---|
+| easy | 23 | 82.6% | 100.0% |
+| hard | 38 | 84.2% | 94.7% |
+| n/a | 5 | 80.0% | 0.0% |
+
+## By category
+
+| group | n | Single agent | Multi-agent (supervisor) |
+|---|---|---|---|
+| arithmetic | 9 | 100.0% | 100.0% |
+| cross-module | 4 | 75.0% | 75.0% |
+| edge-case | 9 | 88.9% | 100.0% |
+| format | 2 | 50.0% | 100.0% |
+| hang | 1 | 100.0% | 100.0% |
+| invalid | 5 | 80.0% | 0.0% |
+| logic | 22 | 77.3% | 95.5% |
+| off-by-one | 10 | 80.0% | 100.0% |
+| operator | 4 | 100.0% | 100.0% |
+</pre>
+</main></div></body></html>

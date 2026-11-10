@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: the guard `if window < 0` in toolkit/stats.py moving_average lets window == 0 through. No patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/stats.py, function moving_average (around line 62), change the guard from `if window < 0` to `if window < 1` so that window == 0 raises ValueError(\"window must be positive\"). Keep the change minimal and leave the existing error message as is. Add a regression test in tests/test_toolkit.py asserting that stats.moving_average([1, 2], 0) raises ValueError. Optionally also cover a negative window. The repro test tests/test_issue_repro.py::test_moving_average_zero_window_raises_value_error should pass after the fix. Run the full test suite to confirm there are no regressions, and report the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "stats",
+  "summary": "stats.moving_average([1, 2], 0) raises ZeroDivisionError instead of ValueError. Input validation is missing for window <= 0. Fix: validate the window argument at the start of moving_average and raise ValueError for window < 1. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 62, in moving_average: the guard is `if window < 0`, so window == 0 passes validation. It then reaches `/ window` on line 66 and raises ZeroDivisionError. The guard should be `window < 1` (or `window <= 0`). The error message already says \"window must be positive\". No existing test or doc contradicts this.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n______________ test_moving_average_zero_window_raises_value_error ______________\n\n    def test_moving_average_zero_window_raises_value_error():\n        with pytest.raises(ValueError):\n>           stats.moving_average([1, 2], 0)\n\ntests/test_issue_repro.py:7: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [1, 2], window = 0\n\n    def moving_average(values, window):\n        if window < 0:\n            raise ValueError(\"window must be positive\")\n        out = []\n        for i in range(len(values) - window + 1):\n>           out.append(sum(values[i:i + window]) / window)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           ZeroDivisionError: division by zero\n\ntoolkit/stats.py:66: ZeroDivisionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_moving_average_zero_window_raises_value_error\n1 failed in 0.24s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approving. The fix addresses the root cause. The old guard `window < 0` let 0 through, and 0 then caused the division by `window`. Changing it to `window < 1` closes that gap for every non-positive window, not just the repro input.\n\nWhat I checked:\n- `moving_average([1,2], 0)` and `moving_average([1,2], -1)` both raise `ValueError(\"window must be positive\")`.\n- Valid inputs are unchanged: a window larger than the list returns `[]`, an empty list returns `[]`, and the existing tests pass.\n- The full suite passes, 86 tests. No existing tests were modified or removed. The new tests only add coverage.\n\nMinor nits, not blocking:\n- The diff includes `__pycache__/*.pyc` files. Please make sure they are not committed, and add them to `.gitignore` if they aren't already ignored.\n- `tests/test_issue_repro.py` duplicates `test_moving_average_zero_window` in `tests/test_toolkit.py`. You could drop the separate repro file.\n- A float window such as 1.5 raises `TypeError` from `range`. That is outside this issue's scope.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,22 @@
+{
+  "tasks_dir": "tasks_data",
+  "out": "results/run",
+  "systems": [
+    "single",
+    "multi"
+  ],
+  "backend": "offline",
+  "model": "anthropic:claude-sonnet-5-5",
+  "fallback_models": [],
+  "router": "rules",
+  "limit": 10,
+  "only": null,
+  "repeats": 1,
+  "workers": 4,
+  "fault_rate": 0.0,
+  "seed": 0,
+  "budget_usd": 1.0,
+  "max_coder_attempts": 3,
+  "max_agent_steps": 25,
+  "max_single_steps": 60
+}

@@ -1,0 +1,7 @@
+{
+  "number": 163,
+  "title": "rotate() goes the wrong way",
+  "body": "### What happened?\n`seq.rotate([1, 2, 3], 1)` returns `[3, 1, 2]`.\n\n### What did you expect?\nIt should return `[2, 3, 1]` (expected: `[2, 3, 1]`).\n\nRotating by 1 should move the first item to the end.\n\n### Version\nlatest main",
+  "author": "t-nakamura",
+  "labels": []
+}

@@ -1,0 +1,77 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  },
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "seq",
+  "summary": "flatten only flattens one level"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py flatten() (lines 10-17): for list/tuple items it calls `out.extend(item)` (line 14), which adds the sub-elements without recursing, so only one nesting level is flattened. Nested lists/tuples deeper than that remain. The fix is to recurse into list/tuple items, e.g. `out.extend(flatten(item))`. flatten has no docstring, no tests and no README mention, so nothing documents one-level behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n______________________________ test_flatten_deep _______________________________\n\n    def test_flatten_deep():\n>       assert seq.flatten([1, [2, [3]]]) == [1, 2, 3]\nE       assert [1, 2, [3]] == [1, 2, 3]\nE         \nE         At index 2 diff: [3] != 3\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n__________________________ test_flatten_deeper_tuple ___________________________\n\n    def test_flatten_deeper_tuple():\n>       assert seq.flatten([[1, (2, [3, [4]])], 5]) == [1, 2, 3, 4, 5]\nE       assert [1, (2, [3, [4]]), 5] == [1, 2, 3, 4, 5]\nE         \nE         At index 1 diff: (2, [3, [4]]) != 2\nE         Right contains 2 more items, first extra item: 4\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_flatten_deep - assert [1, 2, [3]] == [...\nFAILED tests/test_issue_repro.py::test_flatten_deeper_tuple - assert [1, (2, ...\n2 failed in 0.28s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct. `flatten` now recurses into nested lists and tuples. The old code only called `extend(item)` one level down. The change is a single line and fixes the root cause, not just the example in the issue. Strings are not split, because only list and tuple are recursed into. Empty nested lists are handled. The full suite passes (85 tests). The new tests in tests/test_issue_repro.py cover deep lists and mixed tuple/list nesting, and no existing tests were changed.\n\nBefore merging, please drop the committed `__pycache__/*.pyc` files from the diff and add them to .gitignore. They are build artifacts. You could also move the new tests into tests/test_toolkit.py instead of a separate \"repro\" file. Neither is a blocker.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

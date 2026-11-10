@@ -1,0 +1,7 @@
+{
+  "number": 165,
+  "title": "percentile doesn't interpolate",
+  "body": "**Describe the bug**\nCalling `stats.percentile([1, 2, 3, 4], 50)` returns `2`, but it should return `2.5`.\n\nnumpy gives 2.5 here.\n\n**To reproduce**\n```python\nfrom toolkit import stats\nprint(stats.percentile([1, 2, 3, 4], 50))\n```\n\n**Expected behaviour**\nExpected: `2.5`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "jchen42",
+  "labels": []
+}

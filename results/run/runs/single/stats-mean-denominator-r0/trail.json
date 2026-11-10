@@ -1,0 +1,26 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_issue_repro _______________________________\n\n    def test_issue_repro():\n>       assert stats.mean([1, 2, 3, 4]) == 2.5\nE       assert 3.3333333333333335 == 2.5\nE        +  where 3.3333333333333335 = <function mean at 0x1082a9a80>([1, 2, 3, 4])\nE        +    where <function mean at 0x1082a9a80> = stats.mean\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_issue_repro - assert 3.333333333333333...\n1 failed in 0.05s\n",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "SBFL suspicious lines: toolkit/stats.py:7 (1.00), toolkit/stats.py:5 (0.71)"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

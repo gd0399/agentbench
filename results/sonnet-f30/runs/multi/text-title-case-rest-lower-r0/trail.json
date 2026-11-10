@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause with no conflicting tests. The next step is a fix.",
+   "instructions": "In toolkit/text.py, in title_case (around line 35), change `out.append(w[:1].upper() + w[1:])` to `out.append(w[:1].upper() + w[1:].lower())`. Leave the minor-word handling at line 33 as it is. Add a regression test to tests/test_toolkit.py asserting `text.title_case('hELLO wORLD') == 'Hello World'`. The repro test in tests/test_issue_repro.py can stay or be merged into that file. Run the full test suite and confirm everything passes. In the patch notes, mention the side effect that acronyms such as 'NASA' now become 'Nasa', so the reviewer can check it. Do not add acronym special-casing unless an existing test requires it."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.title_case('hELLO wORLD') returns 'HELLO WORLD' instead of 'Hello World'. Stray capitals are not lowercased: the function appears to uppercase the first letter of each word without lowercasing the rest. Fix in toolkit/text.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 35, in title_case: `out.append(w[:1].upper() + w[1:])` uppercases the first letter but leaves the rest of the word unchanged, so 'hELLO' becomes 'HELLO'. The tail should be lowercased: `w[:1].upper() + w[1:].lower()`. Minor words (line 33) are already lowercased. Existing tests only use all-lowercase input, so they don't conflict with the fix. One possible side effect: acronyms such as 'NASA' would become 'Nasa'. The existing tests don't cover that case.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________ test_title_case_lowercases_stray_capitals ___________________\n\n    def test_title_case_lowercases_stray_capitals():\n>       assert text.title_case('hELLO wORLD') == 'Hello World'\nE       AssertionError: assert 'HELLO WORLD' == 'Hello World'\nE         \nE         - Hello World\nE         + HELLO WORLD\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_title_case_lowercases_stray_capitals\n1 failed in 0.28s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The one-line change in `title_case` (`w[1:].lower()`) fixes the root cause: non-minor words were never normalised past their first letter. It is minimal. All 85 tests pass, and no existing tests were changed. `report.py` only passes titles through `title_case`, so it gets the same corrected behaviour.\n\nBefore merging:\n- Remove the committed `__pycache__/*.pyc` files from the diff, and add them to `.gitignore` if they aren't already ignored.\n- `tests/test_issue_repro.py` duplicates the regression test already added to `tests/test_toolkit.py`. Delete the new file.\n\nBehaviour change to note in the changelog: acronyms such as 'NASA' now become 'Nasa'. This follows directly from the issue's expected output, and it matches Python's `str.title`. Users who need acronyms preserved will need a separate option.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

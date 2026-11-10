@@ -1,0 +1,57 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "escalate",
+   "reason": "The coder gave up. rotate() is documented as \"Rotate right by k positions\", and the existing tests test_rotate and test_rotate_wrap assert right rotation. A left-rotation fix would reverse that contract and break those tests, so it is a breaking API change and not a clear bug fix. A maintainer needs to decide between a rotate_left function, support for negative k, or won't-fix. Escalating fits better than closing as invalid, because the reporter's expectation is reasonable and the decision is a product call.",
+   "instructions": "Summarize for the maintainers. rotate(items, k) at toolkit/seq.py:31-36 is documented as \"Rotate right by k positions\" and returns items[-k:] + items[:-k]. tests/test_toolkit.py lines 146-156 assert this behaviour: rotate([1,2,3,4,5],2) == [4,5,1,2,3] and rotate([1,2,3],4) == [3,1,2]. The reporter expects left rotation, so rotate([1,2,3],1) would give [2,3,1]. The repro test tests/test_issue_repro.py fails on the current code. Options: (1) add rotate_left or support negative k, which is non-breaking; (2) switch direction by changing line 36 to items[k:] + items[:k] and updating the existing tests, which is breaking; (3) close as working as intended. Also note that the coder's diff includes stray __pycache__ .pyc files, which should be excluded or cleaned up."
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.rotate([1, 2, 3], 1) returns [3, 1, 2] (rotates right) but should rotate left and return [2, 3, 1], moving the first item to the end. The direction of the rotation is reversed in toolkit/seq.py. The fix should also check negative and zero shifts and shifts larger than the list length, and add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py",
+   "tests/test_toolkit.py"
+  ],
+  "root_cause": "The behaviour is reproduced, but it is documented and tested, so it is probably not a bug. toolkit/seq.py:31-36 defines rotate(items, k) with the docstring \"Rotate right by k positions\". It returns items[-k:] + items[:-k], so rotate([1,2,3],1) gives [3,1,2]. The existing tests in tests/test_toolkit.py lines 146-156 assert right rotation: rotate([1,2,3,4,5],2) == [4,5,1,2,3] and rotate([1,2,3],4) == [3,1,2]. The reporter wants left rotation, which would contradict that documented contract and break those tests. Switching direction would be a breaking API change, not a bug fix. The code does what its docstring says. The issue is better treated as a feature request, for example a negative k or a separate rotate_left, or closed as working as intended. If maintainers do want left rotation, change the slicing at seq.py:36 to items[k:] + items[:k] and update test_rotate and test_rotate_wrap. The repro test tests/test_issue_repro.py fails on current code (got [3,1,2]).",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_rotate_left_by_one ____________________________\n\n    def test_rotate_left_by_one():\n>       assert seq.rotate([1, 2, 3], 1) == [2, 3, 1]\nE       assert [3, 1, 2] == [2, 3, 1]\nE         \nE         At index 0 diff: 3 != 2\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_rotate_left_by_one - assert [3, 1, 2] ...\n1 failed in 0.22s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

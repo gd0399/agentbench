@@ -1,0 +1,42 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "close_invalid",
+   "reason": "Researcher confirmed rotate() is documented as \"Rotate right by k positions\" and existing tests (test_rotate, test_rotate_wrap) require right rotation. The issue asks for the opposite behaviour, so it contradicts documented and tested behaviour. Changing it would break the API.",
+   "instructions": "Close as invalid/not-a-bug. Explain that rotate() is documented as a right rotation (rotate([1,2,3],1) == [3,1,2]) and covered by tests in tests/test_toolkit.py. Suggest a separate rotate_left function or a direction parameter as a feature request if desired. Remove the tests/test_issue_repro.py repro file since it asserts behaviour that contradicts the documented API."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: invalid"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.rotate([1, 2, 3], 1) returns [3, 1, 2] (rotates right) but should rotate left and return [2, 3, 1], moving the first item to the end. The rotation direction is reversed. Check the implementation in toolkit/seq.py, and any existing tests or docs that assume the current direction, before changing it."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py",
+   "tests/test_toolkit.py"
+  ],
+  "root_cause": "The behaviour reproduces, but it is documented and tested, so the report is probably a misunderstanding. toolkit/seq.py:31-36 `rotate` has the docstring \"Rotate right by k positions\". It returns items[-k:] + items[:-k], so rotate([1,2,3],1) gives [3,1,2]. Existing tests in tests/test_toolkit.py:146-156 require right rotation. test_rotate expects rotate([1,2,3,4,5],2) == [4,5,1,2,3], and test_rotate_wrap expects rotate([1,2,3],4) == [3,1,2]. The issue asks for left rotation, which contradicts both. Making that change would break those tests and the documented API. A separate rotate_left function or a direction parameter would be an alternative. The k=0 case has a latent quirk: items[-0:] is the whole list and items[:-0] is empty, so the result is still correct by accident.",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_rotate_left _______________________________\n\n    def test_rotate_left():\n>       assert seq.rotate([1, 2, 3], 1) == [2, 3, 1]\nE       assert [3, 1, 2] == [2, 3, 1]\nE         \nE         At index 0 diff: 3 != 2\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:4: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_rotate_left - assert [3, 1, 2] == [2, ...\n1 failed in 0.07s\n"
+ },
+ "review": null,
+ "resolution": "reported behaviour is intended"
+}

@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: the 30-day tuple in toolkit/dates.py line 13 omits November. A coder can fix it now.",
+   "instructions": "In toolkit/dates.py, days_in_month (line ~13), change the 30-day month tuple from `(4, 6, 9)` to `(4, 6, 9, 11)`. Keep the change minimal. Keep tests/test_issue_repro.py as the regression test; it covers all 12 months plus leap-year February. Run the full test suite and confirm the repro test passes, including the month 11 case, and that nothing else regresses. Check that day_of_year, which sums days_in_month, still passes its tests. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "dates.days_in_month(2023, 11) returns 31 but November has 30 days. Likely an incorrect month-length table or condition in toolkit/dates.py (e.g. November grouped with 31-day months). Needs a fix and a regression test covering all 12 months, including leap-year February."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 13, in days_in_month: the 30-day month tuple is `(4, 6, 9)` and omits November (11). Month 11 falls through to `return 31` on line 15. Fix: change the tuple to `(4, 6, 9, 11)`. The repro test tests/test_issue_repro.py covers all 12 months plus leap February. Only the month 11 case fails. day_of_year is affected downstream for dates after November, because it sums days_in_month.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=12 failed=1 errors=0\n..........F..                                                            [100%]\n=================================== FAILURES ===================================\n________________________ test_days_in_month_2023[11-30] ________________________\n\nmonth = 11, expected = 30\n\n    @pytest.mark.parametrize(\"month,expected\", [\n        (1, 31), (2, 28), (3, 31), (4, 30), (5, 31), (6, 30),\n        (7, 31), (8, 31), (9, 30), (10, 31), (11, 30), (12, 31),\n    ])\n    def test_days_in_month_2023(month, expected):\n>       assert dates.days_in_month(2023, month) == expected\nE       assert 31 == 30\nE        +  where 31 = <function days_in_month at 0x7fd097692700>(2023, 11)\nE        +    where <function days_in_month at 0x7fd097692700> = dates.days_in_month\n\ntests/test_issue_repro.py:10: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_days_in_month_2023[11-30] - assert 31 ...\n1 failed, 12 passed in 0.30s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The fix is correct and minimal. The root cause was November missing from the 30-day tuple in `days_in_month`, and the one-line change fixes it for every year, not just the repro input. `day_of_year` calls `days_in_month`, so it now returns correct values for dates after November too. The full suite passes (95 tests). The new `tests/test_issue_repro.py` checks all 12 months for 2023 plus leap February. No existing tests were changed.\n\nBefore committing, drop the `__pycache__/*.pyc` files that appear in the diff. They are build artifacts, not part of the fix. A `.gitignore` entry for `__pycache__/` would prevent this.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,7 @@
+{
+  "number": 107,
+  "title": "variance() raises for perfectly valid input",
+  "body": "### What happened?\n`stats.variance([1, 2, 3])` raises `ValueError`.\n\n### What did you expect?\nIt should return `1.0` (expected: `1.0`).\n\n### Version\nlatest main",
+  "author": "t-nakamura",
+  "labels": []
+}

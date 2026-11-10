@@ -1,0 +1,18 @@
+{
+  "id": "dates-doy-validation",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "hard",
+  "expr": "dates.day_of_year(2023, 2, 29)",
+  "expected": "raise ValueError",
+  "actual": {
+    "ok": true,
+    "repr": "60"
+  },
+  "failing_hidden_tests": [
+    "test_day_of_year_bad"
+  ],
+  "visible_tests": 83
+}

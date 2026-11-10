@@ -1,0 +1,80 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause and a one-line fix. It doesn't conflict with existing tests, so the coder can implement it.",
+   "instructions": "In toolkit/text.py line ~35 in title_case, change `out.append(w[:1].upper() + w[1:])` to `out.append(w[:1].upper() + w[1:].lower())`. Keep minor-word handling (line 33) unchanged. Add a regression test in tests/test_toolkit.py asserting title_case('hELLO wORLD') == 'Hello World'. tests/test_issue_repro.py already contains the repro test, so make sure it passes, and fold it into test_toolkit.py rather than leaving a duplicate if that fits repo convention. Run the full test suite. Also check toolkit/report.py:30, which calls title_case. Acronyms in report titles would now be lowercased, so confirm that no existing report tests break. Mention that side effect in the patch notes for the reviewer."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "verifier",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 5,
+   "src": "verifier",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "reviewer",
+   "error": "ModelUnavailable: all models failed for reviewer: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'requ",
+   "attempt": 2,
+   "recovered_by": "verifier"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: FAILED -> verifier",
+  "verifier: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.title_case('hELLO wORLD') returns 'HELLO WORLD' instead of 'Hello World'. Stray capitals in the middle of words are kept, so the function probably only uppercases the first letter of each word and does not lowercase the rest. Fix in toolkit/text.py by lowercasing the remainder of each word, then add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/text.py line 35 in title_case: `out.append(w[:1].upper() + w[1:])` uppercases only the first character and keeps the rest of the word as is, so stray capitals survive ('hELLO' -> 'HELLO'). The remainder should be lowercased: `w[:1].upper() + w[1:].lower()`. Minor words are already lowercased (line 33). The existing tests ('the lord of the rings', 'a tale of two cities') are all lowercase input and stay compatible with the fix. Side effect to note: toolkit/report.py:30 calls title_case, so acronyms in titles would also be lowercased.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________ test_title_case_lowers_stray_capitals _____________________\n\n    def test_title_case_lowers_stray_capitals():\n>       assert text.title_case('hELLO wORLD') == 'Hello World'\nE       AssertionError: assert 'HELLO WORLD' == 'Hello World'\nE         \nE         - Hello World\nE         + HELLO WORLD\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_title_case_lowers_stray_capitals - Ass...\n1 failed in 0.02s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier",
+  "attempt": 1
+ },
+ "resolution": null
+}

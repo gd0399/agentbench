@@ -1,0 +1,20 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "This is a difference in definition, not a bug. The docstring says \"Nearest-rank percentile\", and `test_percentile_mid` and `test_percentile_rounds_up` assert nearest-rank results. For `[15, 20, 35, 40, 50]`, p=40 must return 20 and p=30 must return 20. Linear interpolation would return 29 and 23. Nearest-rank on `[1, 2, 3, 4]` at p=50 correctly gives 2. Interpolation could be added as an opt-in option, such as a `method=\"linear\"` parameter, but that is a feature request and would not change the default behaviour.",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "tests/test_toolkit.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

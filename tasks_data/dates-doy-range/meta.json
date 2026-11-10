@@ -1,0 +1,19 @@
+{
+  "id": "dates-doy-range",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "hard",
+  "expr": "dates.day_of_year(2023, 3, 1)",
+  "expected": "60",
+  "actual": {
+    "ok": true,
+    "repr": "91"
+  },
+  "failing_hidden_tests": [
+    "test_day_of_year",
+    "test_day_of_year_leap"
+  ],
+  "visible_tests": 82
+}

@@ -1,0 +1,18 @@
+{
+  "id": "money-discount-full",
+  "kind": "bug",
+  "category": "edge-case",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "easy",
+  "expr": "money.apply_discount(50.0, 100)",
+  "expected": "0.0",
+  "actual": {
+    "ok": false,
+    "exc": "ValueError"
+  },
+  "failing_hidden_tests": [
+    "test_discount_full"
+  ],
+  "visible_tests": 83
+}

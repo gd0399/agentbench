@@ -1,0 +1,18 @@
+{
+  "id": "money-format-negative",
+  "kind": "bug",
+  "category": "format",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "hard",
+  "expr": "money.format_currency(-5)",
+  "expected": "'-$5.00'",
+  "actual": {
+    "ok": true,
+    "repr": "'-$-5.00'"
+  },
+  "failing_hidden_tests": [
+    "test_format_currency_negative"
+  ],
+  "visible_tests": 83
+}

@@ -1,0 +1,7 @@
+{
+  "number": 106,
+  "title": "sample variance uses the population formula",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.variance([2, 4, 4, 4, 5, 5, 7, 9])` returns `4.0`. Expected: `4.571428571428571`.\n\nThanks for the great library!",
+  "author": "mlopez",
+  "labels": []
+}

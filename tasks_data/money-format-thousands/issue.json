@@ -1,0 +1,7 @@
+{
+  "number": 147,
+  "title": "format_currency has no thousands separator",
+  "body": "### What happened?\n`money.format_currency(1234.5)` returns `'$1234.50'`.\n\n### What did you expect?\nIt should return `'$1,234.50'` (expected: `'$1,234.50'`).\n\n### Version\nlatest main",
+  "author": "dev-dana",
+  "labels": []
+}

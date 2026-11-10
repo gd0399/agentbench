@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "The docstring of `stats.percentile` says \"Nearest-rank percentile\". `test_percentile_rounds_up` expects `percentile([15,20,35,40,50], 30) == 20`. Linear interpolation, which is numpy's default, would return 23 for that input. `test_percentile_mid` (p=40 expects 20) and the other percentile tests are also written for nearest-rank, so `[1,2,3,4]` at p=50 returning 2 is the intended result. The issue asks for a different method (interpolation) than the one the function documents. If interpolation is wanted, it should be added as an opt-in, for example a `method=\"linear\"` parameter or a separate function, and the default left unchanged.",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

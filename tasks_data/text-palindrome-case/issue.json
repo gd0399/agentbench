@@ -1,0 +1,7 @@
+{
+  "number": 120,
+  "title": "is_palindrome is case-sensitive",
+  "body": "### What happened?\n`text.is_palindrome('Racecar')` returns `False`.\n\n### What did you expect?\nIt should return `True` (expected: `True`).\n\n### Version\nlatest main",
+  "author": "sven.o",
+  "labels": []
+}

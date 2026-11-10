@@ -1,0 +1,19 @@
+{
+  "id": "dates-november-days",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "hard",
+  "expr": "dates.days_in_month(2023, 11)",
+  "expected": "30",
+  "actual": {
+    "ok": true,
+    "repr": "31"
+  },
+  "failing_hidden_tests": [
+    "test_day_of_year_leap",
+    "test_days_in_month"
+  ],
+  "visible_tests": 82
+}

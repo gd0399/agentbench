@@ -1,0 +1,7 @@
+{
+  "number": 133,
+  "title": "sliding_window misses the final window",
+  "body": "**Describe the bug**\nCalling `seq.sliding_window([1, 2, 3, 4], 3)` returns `[(1, 2, 3)]`, but it should return `[(1, 2, 3), (2, 3, 4)]`.\n\n**To reproduce**\n```python\nfrom toolkit import seq\nprint(seq.sliding_window([1, 2, 3, 4], 3))\n```\n\n**Expected behaviour**\nExpected: `[(1, 2, 3), (2, 3, 4)]`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "mlopez",
+  "labels": []
+}

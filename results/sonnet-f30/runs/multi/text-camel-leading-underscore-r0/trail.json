@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug reproduced with a failing test and root cause identified; no patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/text.py, fix camel_to_snake (around lines 48-54) so it adds the \"_\" before an uppercase character only when its index i > 0 (the loop already enumerates i but doesn't use it). 'Value' must return 'value', and the existing behaviour for 'parseHttpResponse' must stay the same. Keep the change minimal. Run tests/test_issue_repro.py and the full test suite to confirm they pass, then report the diff."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "camel_to_snake adds a leading underscore"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "In toolkit/text.py, camel_to_snake (lines 48-54) adds \"_\" before every uppercase character, including the one at index 0. The loop enumerates i but never uses it. A leading capital such as 'Value' therefore becomes '_value'. The fix is to add the underscore only when i > 0. The existing test, 'parseHttpResponse', has no leading capital, so it doesn't conflict with the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________ test_camel_to_snake_no_leading_underscore ___________________\n\n    def test_camel_to_snake_no_leading_underscore():\n>       assert text.camel_to_snake('Value') == 'value'\nE       AssertionError: assert '_value' == 'value'\nE         \nE         - value\nE         + _value\nE         ? +\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_camel_to_snake_no_leading_underscore\n1 failed in 0.26s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The fix changes the condition to `c.isupper() and i > 0`. This addresses the root cause, which was an underscore being emitted before the first character. It is not special-cased to the 'Value' input. I ran the full suite and 84 tests pass. The existing test was not modified, and the new regression test is a reasonable addition. Probes:\n- 'Value' -> 'value'.\n- 'parseHttpResponse' -> 'parse_http_response' (unchanged).\n- 'X' -> 'x', and '' -> ''.\n\nSome behaviours are still odd but were already there and are outside this issue: 'HTTPResponse' -> 'h_t_t_p_response', and '_Value' -> '__value'. Open a separate issue if you want to handle them.\n\nPlease drop the committed `__pycache__/*.pyc` files before merging. They are build artifacts that came from running tests, and a `.gitignore` entry would keep them out. The real change is only `toolkit/text.py` and `tests/test_issue_repro.py`.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

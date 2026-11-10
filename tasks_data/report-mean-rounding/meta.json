@@ -1,0 +1,19 @@
+{
+  "id": "report-mean-rounding",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/report.py",
+  "component": "report",
+  "difficulty": "hard",
+  "expr": "report.summarize([1, 2, 3, 4])",
+  "expected": "{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}",
+  "actual": {
+    "ok": true,
+    "repr": "{'count': 4, 'mean': 2, 'median': 2.5, 'max': 4}"
+  },
+  "failing_hidden_tests": [
+    "test_summarize",
+    "test_summarize_unsorted"
+  ],
+  "visible_tests": 82
+}

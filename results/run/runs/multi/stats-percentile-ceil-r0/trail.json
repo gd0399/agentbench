@@ -1,0 +1,87 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "address review feedback: regression: existing tests fail test_percentile_mid, test_percentile_max",
+   "instructions": ""
+  },
+  {
+   "step": 5,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 6,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "address review feedback: regression: existing tests fail test_percentile_mid, test_percentile_max",
+   "instructions": ""
+  },
+  {
+   "step": 7,
+   "src": "coder",
+   "dst": "close_invalid",
+   "reason": "every fix contradicts existing tested behaviour",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "close: invalid"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "percentile() rounds the rank down instead of up"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_issue_repro _______________________________\n\n    def test_issue_repro():\n>       assert stats.percentile([15, 20, 35, 40, 50], 30) == 20\nE       assert 15 == 20\nE        +  where 15 = <function percentile at 0x107ad1d00>([15, 20, 35, 40, 50], 30)\nE        +    where <function percentile at 0x107ad1d00> = stats.percentile\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_issue_repro - assert 15 == 20\n1 failed in 0.04s\n",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "SBFL suspicious lines: toolkit/stats.py:57 (0.58), toolkit/stats.py:58 (0.58), toolkit/stats.py:54 (0.50), toolkit/stats.py:55 (0.50), toolkit/stats.py:50 (0.45)"
+ },
+ "review": {
+  "approved": false,
+  "tests_passed": false,
+  "repro_passed": true,
+  "feedback": "regression: existing tests fail test_percentile_mid, test_percentile_max",
+  "reviewer": "reviewer",
+  "attempt": 2
+ },
+ "resolution": "reported behaviour is intended"
+}

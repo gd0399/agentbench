@@ -1,0 +1,7 @@
+{
+  "number": 127,
+  "title": "pages() undercounts when the last page has one item",
+  "body": "**Describe the bug**\nCalling `report.pages(list(range(5)), 2)` returns `2`, but it should return `3`.\n\n**To reproduce**\n```python\nfrom toolkit import report\nprint(report.pages(list(range(5)), 2))\n```\n\n**Expected behaviour**\nExpected: `3`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "dev-dana",
+  "labels": []
+}

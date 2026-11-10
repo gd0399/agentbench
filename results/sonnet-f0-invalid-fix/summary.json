@@ -1,0 +1,90 @@
+{
+  "config": {
+    "tasks_dir": "tasks_data",
+    "out": "results/sonnet-f0-invalid-fix",
+    "systems": [
+      "multi"
+    ],
+    "backend": "llm",
+    "model": "anthropic:claude-sonnet-5-5",
+    "fallback_models": [
+      "anthropic:claude-haiku-5-5"
+    ],
+    "router": "llm",
+    "limit": null,
+    "only": [
+      "invalid-median-lower",
+      "invalid-rotate-left",
+      "invalid-leap-1900",
+      "invalid-percentile-interp",
+      "invalid-word-count-hyphen"
+    ],
+    "repeats": 1,
+    "workers": 5,
+    "fault_rate": 0.0,
+    "seed": 0,
+    "budget_usd": 1.0,
+    "max_coder_attempts": 3,
+    "max_agent_steps": 25,
+    "max_single_steps": 60
+  },
+  "n_rows": 5,
+  "n_tasks": 5,
+  "systems": {
+    "multi": {
+      "n": 5,
+      "successes": 4,
+      "success_rate": 0.8,
+      "success_ci95": [
+        0.3755282641185388,
+        0.9637768390302125
+      ],
+      "false_positive_pr_rate": 0.2,
+      "cost_per_task_mean": 0.0544408,
+      "cost_per_task_median": 0.040038,
+      "cost_per_success": 0.068051,
+      "total_cost": 0.272204,
+      "latency_mean_s": 19.5988,
+      "latency_p50_s": 16.906,
+      "latency_p95_s": 29.035199999999996,
+      "llm_calls_mean": 7.6,
+      "input_tokens_mean": 18166.4,
+      "output_tokens_mean": 1810.8,
+      "handoffs_mean": 2.4,
+      "injected_failures": 0,
+      "recovered_errors": 0,
+      "localization_acc": null,
+      "triage_acc": 1.0,
+      "statuses": {
+        "invalid": 4,
+        "pr_opened": 1
+      }
+    }
+  },
+  "by_difficulty": {
+    "n/a": {
+      "multi": {
+        "n": 5,
+        "success_rate": 0.8
+      }
+    }
+  },
+  "by_category": {
+    "invalid": {
+      "multi": {
+        "n": 5,
+        "success_rate": 0.8
+      }
+    }
+  },
+  "by_kind": {
+    "invalid": {
+      "multi": {
+        "n": 5,
+        "success_rate": 0.8
+      }
+    }
+  },
+  "paired": null,
+  "harness_errors": []
+}

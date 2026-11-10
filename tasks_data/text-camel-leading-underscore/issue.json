@@ -1,0 +1,7 @@
+{
+  "number": 126,
+  "title": "camel_to_snake adds a leading underscore",
+  "body": "### What happened?\n`text.camel_to_snake('Value')` returns `'_value'`.\n\n### What did you expect?\nIt should return `'value'` (expected: `'value'`).\n\n### Version\nlatest main",
+  "author": "kwame-a",
+  "labels": []
+}

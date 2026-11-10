@@ -1,0 +1,7 @@
+{
+  "number": 145,
+  "title": "compound_interest ignores periods_per_year",
+  "body": "**Describe the bug**\nCalling `money.compound_interest(1000, 0.12, 1, 12)` returns `1010.0`, but it should return `1126.83`.\n\n**To reproduce**\n```python\nfrom toolkit import money\nprint(money.compound_interest(1000, 0.12, 1, 12))\n```\n\n**Expected behaviour**\nExpected: `1126.83`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "sven.o",
+  "labels": []
+}

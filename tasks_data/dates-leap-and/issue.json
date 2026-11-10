@@ -1,0 +1,7 @@
+{
+  "number": 149,
+  "title": "2024 is not treated as a leap year",
+  "body": "**Describe the bug**\nCalling `dates.is_leap_year(2024)` returns `False`, but it should return `True`.\n\n**To reproduce**\n```python\nfrom toolkit import dates\nprint(dates.is_leap_year(2024))\n```\n\n**Expected behaviour**\nExpected: `True`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "dev-dana",
+  "labels": []
+}

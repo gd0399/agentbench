@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.percentile() rounds the rank down instead of up. With the nearest-rank method, percentile([15, 20, 35, 40, 50], 30) should return 20, but it returns 15. The rank is ceil(0.30 * 5) = 2, which gives the 2nd element (20). The function probably uses floor or int() instead of ceil when computing the rank. Fix in toolkit/stats.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 57 in percentile(): `rank = p * len(ordered) // 100` uses floor division, so the nearest-rank rank is floored instead of ceil'd. For p=30, n=5: 150//100 = 1 -> ordered[0] = 15; it should be ceil(1.5) = 2 -> ordered[1] = 20. Fix: use ceiling, e.g. `rank = math.ceil(p * len(ordered) / 100)` or `-(-p * len(ordered) // 100)` (avoid float issues for integer p). Existing tests (p=0, 40, 100, bounds) remain compatible, since they hit exact integer ranks.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n________________________ test_percentile_rank_rounds_up ________________________\n\n    def test_percentile_rank_rounds_up():\n>       assert stats.percentile([15, 20, 35, 40, 50], 30) == 20\nE       assert 15 == 20\nE        +  where 15 = <function percentile at 0x7efd974328e0>([15, 20, 35, 40, 50], 30)\nE        +    where <function percentile at 0x7efd974328e0> = stats.percentile\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_percentile_rank_rounds_up - assert 15 ...\n1 failed in 0.26s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The change fixes the root cause. Nearest-rank percentile is ceil(p*n/100), and the old code used floor. The new ceiling division gives that rank. I checked it on [15,20,35,40,50]:\n\n| p | result |\n|---|---|\n| 0 | 15 |\n| 1 | 15 |\n| 20 | 15 |\n| 25 | 20 |\n| 30 | 20 |\n| 40 | 20 |\n| 50 | 35 |\n| 99 | 50 |\n| 100 | 50 |\n| 101 | ValueError (unchanged) |\n\nA single-element list and a float p (25.5) also work. All 84 tests pass. No existing tests were changed. The new test only adds a regression test for the issue.\n\nMinor nits, none blocking:\n- `max(int(rank), 1)` is redundant, because p > 0 already gives rank >= 1 after the ceiling.\n- The diff contains committed `__pycache__/*.pyc` files. Please make sure they are not included in the merge, or add them to `.gitignore`.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

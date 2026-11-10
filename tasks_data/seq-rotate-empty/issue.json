@@ -1,0 +1,7 @@
+{
+  "number": 132,
+  "title": "rotate([]) raises ZeroDivisionError",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`seq.rotate([], 3)` raises `ZeroDivisionError`. Expected: `[]`.\n\nThanks for the great library!",
+  "author": "jchen42",
+  "labels": []
+}

@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "stats.median returns an incorrect value for odd-length lists. For [3, 1, 2] it returns 1.5 but should return 2. It looks like the odd-length case is being handled wrongly, for example averaging the wrong elements or not sorting first. The issue was reported from production use, so wrong results are likely affecting real users."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py median() lines 16-18: the even/odd branches are swapped. `if n % 2 == 0: return ordered[mid]` returns the upper-middle element for even lengths, and the odd-length fallthrough `return (ordered[mid-1] + ordered[mid]) / 2` averages two neighbours (for [3,1,2] sorted [1,2,3], mid=1 -> (1+2)/2 = 1.5). Fix: odd n -> return ordered[mid]; even n -> return (ordered[mid-1] + ordered[mid]) / 2. Even-length lists are also wrong (e.g. [4,1,3,2] gives 3 instead of 2.5). Sorting is fine. Repro tests in tests/test_issue_repro.py (odd and even). No existing test covers non-empty median, and nothing contradicts the requested behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n____________________________ test_median_odd_length ____________________________\n\n    def test_median_odd_length():\n>       assert stats.median([3, 1, 2]) == 2\nE       assert 1.5 == 2\nE        +  where 1.5 = <function median at 0x7f82f1092700>([3, 1, 2])\nE        +    where <function median at 0x7f82f1092700> = stats.median\n\ntests/test_issue_repro.py:5: AssertionError\n___________________________ test_median_even_length ____________________________\n\n    def test_median_even_length():\n>       assert stats.median([4, 1, 3, 2]) == 2.5\nE       assert 3 == 2.5\nE        +  where 3 = <function median at 0x7f82f1092700>([4, 1, 3, 2])\nE        +    where <function median at 0x7f82f1092700> = stats.median\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_median_odd_length - assert 1.5 == 2\nFAILED tests/test_issue_repro.py::test_median_even_length - assert 3 == 2.5\n2 failed in 0.30s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix addresses the root cause. The parity branches in `median` were inverted, and the one-line change from `n % 2 == 0` to `n % 2 == 1` corrects them. I ran the following checks:\n- The full suite passes (82 tests).\n- `median([3,1,2])` returns 2.\n- `median([4,1,3,2])` returns 2.5.\n- `median([5])` returns 5.\n- `median([1,2])` returns 1.5.\n- `median([])` still raises `ValueError`.\n\nThe new tests in `tests/test_issue_repro.py` cover both parities, and no existing tests were changed. `report.py` is the only other caller and needs no change.\n\nOne cleanup before merging: the diff includes compiled `__pycache__/*.pyc` files. Drop them from the commit and add `__pycache__/` to `.gitignore`. They are build artifacts and not part of the fix. The source change itself is fine.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

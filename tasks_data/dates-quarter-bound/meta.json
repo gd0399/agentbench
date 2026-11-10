@@ -1,0 +1,18 @@
+{
+  "id": "dates-quarter-bound",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "easy",
+  "expr": "dates.quarter_of(12)",
+  "expected": "4",
+  "actual": {
+    "ok": false,
+    "exc": "ValueError"
+  },
+  "failing_hidden_tests": [
+    "test_quarter_of"
+  ],
+  "visible_tests": 83
+}

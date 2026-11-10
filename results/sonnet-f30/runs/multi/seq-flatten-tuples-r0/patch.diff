@@ -1,0 +1,47 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 03ce9ae..8c331aa 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -176,6 +176,15 @@ def test_last_n():
+ def test_last_n_zero():
+     assert seq.last_n([1, 2, 3], 0) == []
+ 
++def test_flatten_tuples():
++    assert seq.flatten([1, (2, 3)]) == [1, 2, 3]
++
++def test_flatten_nested_mixed():
++    assert seq.flatten([1, [2, (3, [4])]]) == [1, 2, 3, 4]
++
++def test_flatten_strings_not_flattened():
++    assert seq.flatten(['ab', b'x', (1,)]) == ['ab', b'x', 1]
++
+ def test_discount():
+     assert money.apply_discount(80.0, 25) == 60.0
+ 
+diff --git a/toolkit/seq.py b/toolkit/seq.py
+index da7ec28..41f24ed 100644
+--- a/toolkit/seq.py
++++ b/toolkit/seq.py
+@@ -8,9 +8,13 @@ def chunk(items, size):
+ 
+ 
+ def flatten(nested):
++    """Recursively flatten nested lists and tuples into a single list.
++
++    Strings and bytes are treated as scalars and are not flattened.
++    """
+     out = []
+     for item in nested:
+-        if isinstance(item, list):
++        if isinstance(item, (list, tuple)):
+             out.extend(flatten(item))
+         else:
+             out.append(item)

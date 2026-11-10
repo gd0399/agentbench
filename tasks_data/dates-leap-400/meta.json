@@ -1,0 +1,18 @@
+{
+  "id": "dates-leap-400",
+  "kind": "bug",
+  "category": "operator",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "easy",
+  "expr": "dates.is_leap_year(2000)",
+  "expected": "True",
+  "actual": {
+    "ok": true,
+    "repr": "False"
+  },
+  "failing_hidden_tests": [
+    "test_leap_years"
+  ],
+  "visible_tests": 83
+}

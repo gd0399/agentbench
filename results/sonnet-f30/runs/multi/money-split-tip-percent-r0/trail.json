@@ -1,0 +1,80 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause (toolkit/money.py line 13 uses tip_percent as a raw multiplier). It doesn't conflict with existing tests, and no patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/money.py, in split_bill (line ~13), change `with_tip = total * (1 + tip_percent)` to `with_tip = total * (1 + tip_percent / 100)`. This matches how apply_discount handles percents. Add a regression test to tests/test_toolkit.py asserting `money.split_bill(100, 4, tip_percent=20) == 30.0`. You can base it on tests/test_issue_repro.py. Make sure the existing tests still pass, including the ones that use tip_percent=0. Keep the change minimal and don't touch unrelated code."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "The money.py fix and the regression test are correct. The diff is polluted with committed build artifacts and a duplicate repro test, so it needs cleanup before it can be merged.",
+   "instructions": "Keep the toolkit/money.py change (`tip_percent / 100`) and the `test_split_bill_tip_is_percent` regression test in tests/test_toolkit.py. Clean up the patch in these ways:\n1. Remove every __pycache__/*.pyc file from the diff. This includes __pycache__/conftest*.pyc, tests/__pycache__/*, and toolkit/__pycache__/*. Untrack them with `git rm --cached` if they were added, or delete them. Do not commit them. If the repo has no .gitignore entry for __pycache__/ and *.pyc, add one.\n2. Delete the scratch file tests/test_issue_repro.py. It duplicates the regression test already in tests/test_toolkit.py.\n3. Rerun the full test suite and confirm it still passes. The final diff should touch only toolkit/money.py and tests/test_toolkit.py, plus .gitignore if you added it.\n4. Report the updated diff summary."
+  },
+  {
+   "step": 5,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 6,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "money",
+  "summary": "money.split_bill treats tip_percent as a multiplier instead of a percentage. split_bill(100, 4, tip_percent=20) returns 525.0, which is 100*(1+20)/4. It should return 30.0, which is 100*(1+20/100)/4. The fix is to divide tip_percent by 100 in toolkit/money.py. A regression test should be added in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py"
+  ],
+  "root_cause": "toolkit/money.py line 13, in split_bill: `with_tip = total * (1 + tip_percent)` uses tip_percent as a raw multiplier. For tip_percent=20 this gives 100*21/4 = 525.0. It should be `total * (1 + tip_percent / 100)`, which matches apply_discount's percent handling and gives 30.0. The existing tests only use tip_percent=0, so they don't cover this and don't conflict with the fix.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n________________________ test_split_bill_tip_is_percent ________________________\n\n    def test_split_bill_tip_is_percent():\n>       assert money.split_bill(100, 4, tip_percent=20) == 30.0\nE       assert 525.0 == 30.0\nE        +  where 525.0 = <function split_bill at 0x7f77d1c327a0>(100, 4, tip_percent=20)\nE        +    where <function split_bill at 0x7f77d1c327a0> = money.split_bill\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_split_bill_tip_is_percent - assert 525...\n1 failed in 0.20s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "I would merge this. The fix addresses the root cause: `tip_percent` is now divided by 100 before being used as a multiplier. split_bill(100, 4, tip_percent=20) gives 120/4 = 30.0, which matches the issue. The default tip of 0 behaves as before, so the existing tests are unaffected. The full suite passes (85 tests). No existing tests were changed. The two new regression tests are legitimate: the issue case, and a non-round case (115/3 \u2192 38.33). The `.gitignore` is not needed for this issue, but it is harmless. Remove it next time to keep the patch minimal.",
+  "reviewer": "reviewer",
+  "attempt": 2
+ },
+ "resolution": null
+}

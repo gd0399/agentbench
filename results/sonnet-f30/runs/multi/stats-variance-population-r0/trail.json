@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause in toolkit/stats.py variance(): the sample branch divides by n instead of n-1. No conflict with existing tests. Ready for a fix.",
+   "instructions": "In toolkit/stats.py, variance(), lines 43-45: change the `if sample:` branch to return `total / (n - 1)` instead of `total / n`. Leave the population branch (sample=False) and the n<2 guards unchanged. Run tests/test_issue_repro.py (it should pass: variance([2,4,4,4,5,5,7,9]) \u2248 4.571428571428571) and the full test suite, including test_variance_population, to confirm there are no regressions. Keep the diff minimal. Also check whether other callers in the repo (e.g. stdev) rely on variance's default sample behavior and report any behavior changes."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "sample variance uses the population formula"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py, variance(), lines 43-45: the `if sample:` branch returns `total / n` \u2014 identical to the population branch. It should return `total / (n - 1)`. The population path (sample=False) is correct and tested by test_variance_population; the guards (n<2) are fine.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_____________________ test_sample_variance_uses_n_minus_1 ______________________\n\n    def test_sample_variance_uses_n_minus_1():\n>       assert stats.variance([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(4.571428571428571)\nE       assert 4.0 == 4.571428571428571 \u00b1 4.6e-06\nE         \nE         comparison failed\nE         Obtained: 4.0\nE         Expected: 4.571428571428571 \u00b1 4.6e-06\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_sample_variance_uses_n_minus_1 - asser...\n1 failed in 0.35s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The change is correct and minimal. The sample branch of variance() now divides by (n - 1). That is the root cause, and the population branch is unchanged. The n < 2 guard runs before the division, so there is no divide-by-zero. I ran the suite and all 84 tests pass. I searched for callers: report.py doesn't use variance, so nothing else is affected. The existing test_variance_population is untouched, and the new regression test (tests/test_issue_repro.py) checks the exact value from the issue, 4.5714.... No existing tests were modified.\n\nNit: the diff includes committed __pycache__/*.pyc files. Please drop them from the patch and add __pycache__/ to .gitignore if it isn't there already. This is only hygiene and doesn't block the merge.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

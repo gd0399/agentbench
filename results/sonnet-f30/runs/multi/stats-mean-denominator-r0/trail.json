@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: an off-by-one divisor in toolkit/stats.py::mean. No patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/stats.py line 7, change mean() to divide by len(values) instead of (len(values) - 1). Then check toolkit/report.py. The researcher says it has its own mean with the same problem, so fix that one too if it has the same off-by-one. Check that variance() gives correct results now that mean() is fixed. Consider what mean() should do on an empty list, and keep the existing behavior unless existing tests say otherwise. Add a regression test to tests/test_toolkit.py for stats.mean([1, 2, 3, 4]) == 2.5, plus a single-element case such as mean([5]) == 5. Run the full test suite, including tests/test_issue_repro.py, and report the results. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "stats.mean([1, 2, 3, 4]) returns 3.3333333333333335 instead of 2.5. The result looks like the sum (10) divided by 3 instead of 4, so the divisor is probably off by one (len(values) - 1), or the last element is dropped from the count. Next step: the researcher should inspect toolkit/stats.py::mean. The coder should then fix the divisor and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/stats.py line 7, mean() returns sum(values) / (len(values) - 1) instead of / len(values). This is an off-by-one divisor, so [1,2,3,4] gives 10/3. It also affects variance() (which calls mean) and report.py's mean. A single-element list would raise ZeroDivisionError.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_mean_basic ________________________________\n\n    def test_mean_basic():\n>       assert stats.mean([1, 2, 3, 4]) == 2.5\nE       assert 3.3333333333333335 == 2.5\nE        +  where 3.3333333333333335 = <function mean at 0x7f87e2c92660>([1, 2, 3, 4])\nE        +    where <function mean at 0x7f87e2c92660> = stats.mean\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_mean_basic - assert 3.3333333333333335...\n1 failed in 0.27s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. The root cause was `mean()` dividing by `len(values) - 1`, and it now divides by `len(values)`. The empty-list ValueError is kept. `variance()` calls `mean()`, so it was also wrong before and is now correct. The new variance test checks both the sample and population forms. `report.py` only calls `stats.mean`, so it needs no change. I found no other off-by-one of the same kind in the repo. All 82 tests pass, and no existing tests were changed or weakened.\n\nNits, not blocking:\n- The diff includes generated `__pycache__/*.pyc` files. Drop them before merging, or add them to `.gitignore`.\n- `test_mean_basic` appears in both `tests/test_issue_repro.py` and `tests/test_toolkit.py`. One copy is enough.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

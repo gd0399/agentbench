@@ -1,0 +1,7 @@
+{
+  "number": 125,
+  "title": "initials() are not capitalised",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.initials('ada lovelace')` returns `'al'`. Expected: `'AL'`.\n\nThanks for the great library!",
+  "author": "dev-dana",
+  "labels": []
+}

@@ -1,0 +1,73 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..59bcdcd
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..9f253bb
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..4dd5f97
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 6c85561..d764094 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -257,3 +257,15 @@ def test_headline():
+ def test_pages():
+     assert report.pages(list(range(10)), 3) == 4
+ 
++
++def test_top_words_returns_n():
++    assert report.top_words('z y x', 2) == ['x', 'y']
++
++def test_top_words_ranking():
++    assert report.top_words('b a b c', 2) == ['b', 'a']
++
++def test_top_words_zero():
++    assert report.top_words('z y x', 0) == []
++
++def test_top_words_n_too_large():
++    assert report.top_words('z y x', 10) == ['x', 'y', 'z']
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..e98eba6
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..cde9e00
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..177283d
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..8fcc33a
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..78d4a76
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..aa3d9a5
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..dc07e7e
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/report.py b/toolkit/report.py
+index 32354ba..e340a64 100644
+--- a/toolkit/report.py
++++ b/toolkit/report.py
+@@ -17,7 +17,7 @@ def top_words(s, n):
+     for w in words:
+         counts[w] = counts.get(w, 0) + 1
+     ranked = sorted(counts, key=lambda w: (-counts[w], w))
+-    return ranked[:n - 1]
++    return ranked[:n]
+ 
+ 
+ def invoice_total(lines, discount_percent=0, tax_rate=0):

@@ -1,0 +1,18 @@
+{
+  "id": "text-vowels-missing-u",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "easy",
+  "expr": "text.count_vowels('Education')",
+  "expected": "5",
+  "actual": {
+    "ok": true,
+    "repr": "4"
+  },
+  "failing_hidden_tests": [
+    "test_count_vowels"
+  ],
+  "visible_tests": 83
+}

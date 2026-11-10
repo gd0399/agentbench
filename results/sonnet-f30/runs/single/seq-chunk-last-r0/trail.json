@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [
+  {
+   "agent": "single",
+   "error": "InjectedFailure: injected failure in single (call 2)",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "single: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": null,
+ "research": {},
+ "review": null,
+ "resolution": "needs a human"
+}

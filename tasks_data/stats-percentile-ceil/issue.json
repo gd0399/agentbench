@@ -1,0 +1,7 @@
+{
+  "number": 108,
+  "title": "percentile() rounds the rank down instead of up",
+  "body": "### What happened?\n`stats.percentile([15, 20, 35, 40, 50], 30)` returns `15`.\n\n### What did you expect?\nIt should return `20` (expected: `20`).\n\n### Version\nlatest main",
+  "author": "dev-dana",
+  "labels": []
+}

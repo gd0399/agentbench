@@ -1,0 +1,52 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "researcher unavailable: work directly from the issue",
+   "instructions": "The researcher is unavailable: reproduce and localise the bug yourself first."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "escalate",
+   "reason": "coder gave up",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "researcher",
+   "error": "InjectedFailure: injected failure in researcher (call 2)",
+   "attempt": 2,
+   "recovered_by": "coder"
+  }
+ ],
+ "trace": [
+  "researcher: FAILED -> coder",
+  "coder: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.percentile does not use linear interpolation between neighbouring ranks. percentile([1, 2, 3, 4], 50) returns 2 where numpy's default linear method returns 2.5. The likely cause is that it picks a nearest-rank element instead of interpolating. The fix is in toolkit/stats.py, and a regression test should be added to tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "degraded": true,
+  "suspected_files": [],
+  "root_cause": "researcher unavailable; not yet investigated"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

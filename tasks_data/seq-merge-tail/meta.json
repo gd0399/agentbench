@@ -1,0 +1,19 @@
+{
+  "id": "seq-merge-tail",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.merge_sorted([1, 4, 6], [2, 3, 7, 8])",
+  "expected": "[1, 2, 3, 4, 6, 7, 8]",
+  "actual": {
+    "ok": true,
+    "repr": "[1, 2, 3, 4, 6]"
+  },
+  "failing_hidden_tests": [
+    "test_merge_sorted",
+    "test_merge_sorted_stable"
+  ],
+  "visible_tests": 82
+}

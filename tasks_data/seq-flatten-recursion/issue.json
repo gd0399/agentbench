@@ -1,0 +1,7 @@
+{
+  "number": 129,
+  "title": "flatten only flattens one level",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`seq.flatten([1, [2, [3]]])` returns `[1, 2, [3]]`. Expected: `[1, 2, 3]`.\n\nThanks for the great library!",
+  "author": "kwame-a",
+  "labels": []
+}

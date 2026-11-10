@@ -1,0 +1,7 @@
+{
+  "number": 148,
+  "title": "invoice_total fails for tax-free invoices",
+  "body": "### What happened?\n`report.invoice_total([(1, 100.0)], tax_rate=0)` raises `ValueError`.\n\n### What did you expect?\nIt should return `100.0` (expected: `100.0`).\n\n### Version\nlatest main",
+  "author": "octocat",
+  "labels": []
+}

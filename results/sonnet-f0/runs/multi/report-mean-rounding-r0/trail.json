@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: round() wrapping stats.mean in toolkit/report.py line 8. No test conflicts. The fix is small and clear.",
+   "instructions": "In toolkit/report.py line 8, inside summarize(), change `\"mean\": round(stats.mean(values))` to `\"mean\": stats.mean(values)`. Don't change toolkit/stats.py because stats.mean is correct. Keep the existing repro test tests/test_issue_repro.py::test_summarize_mean_not_rounded. Run it and the full test suite to confirm everything passes. Keep the diff minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.summarize([1, 2, 3, 4]) returns mean 2 instead of 2.5. The mean appears to be rounded or truncated to an integer, probably through integer division or an int()/round() call in toolkit/report.py. It could also come from a helper in toolkit/stats.py. The median is computed correctly. Expected output is {'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 8, in summarize(): `\"mean\": round(stats.mean(values))` wraps the mean in round() with no ndigits, so 2.5 becomes 2 (banker's rounding). stats.mean (toolkit/stats.py:7) is correct (sum/len, true division). Fix: drop the round() and use stats.mean(values). No existing tests or docstrings cover summarize, so there is no conflict.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________ test_summarize_mean_not_rounded ________________________\n\n    def test_summarize_mean_not_rounded():\n>       assert report.summarize([1, 2, 3, 4]) == {\"count\": 4, \"mean\": 2.5, \"median\": 2.5, \"max\": 4}\nE       AssertionError: assert {'count': 4, ...2.5, 'max': 4} == {'count': 4, ...2.5, 'max': 4}\nE         \nE         Omitting 3 identical items, use -vv to show\nE         Differing items:\nE         {'mean': 2} != {'mean': 2.5}\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_summarize_mean_not_rounded - Assertion...\n1 failed in 0.16s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was the `round()` in `report.summarize`. `stats.mean` already returns the true mean, and its existing tests pass. Removing the `round()` is the minimal fix. It doesn't special-case the input from the issue. `summarize` has no other callers, so nothing else depends on the rounded value. The full suite passes (83 tests). The new regression test in `tests/test_issue_repro.py` is reasonable, and no existing tests were changed. Before merging, drop the `__pycache__/*.pyc` files from the diff and add `__pycache__/` to `.gitignore` if it isn't already there. They are build artifacts and don't belong in the patch.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

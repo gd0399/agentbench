@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: the parity branches in toolkit/stats.py median() are swapped. No patch exists yet, and there is no conflict with existing tests, so the coder should write the fix.",
+   "instructions": "In toolkit/stats.py median() (around lines 16-18), swap the parity branches. For odd n, return ordered[mid]. For even n, return (ordered[mid-1] + ordered[mid]) / 2. Keep the existing sort and the empty-input error behavior unchanged. Make the change minimal. Run tests/test_issue_repro.py, which should give median([3,1,2]) == 2 and median([4,1,3,2]) == 2.5, and then the full test suite to confirm there are no regressions. Keep the repro tests in the repo as regression tests. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "stats.median returns an incorrect value for odd-length lists. For example, stats.median([3, 1, 2]) returns 1.5 where 2 is expected. The cause is likely in how the middle element is chosen, or in the even-length averaging logic being applied to odd-length input. It could also be a missing sort. The reporter is hitting this in production, so wrong results are being returned silently."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py median(), lines 16-18: the parity branches are swapped. `if n % 2 == 0: return ordered[mid]` handles even length by returning the upper-middle element, and the fall-through `return (ordered[mid-1] + ordered[mid]) / 2` handles odd length by averaging two elements. For [3,1,2] this gives (1+2)/2 = 1.5 instead of ordered[1] = 2. Even-length input is also wrong: [4,1,3,2] gives 3 instead of 2.5. The sort is present and correct. The fix is to return ordered[mid] when n is odd, and average ordered[mid-1] and ordered[mid] when n is even. There is no conflict with existing tests, since the only median test covers the empty-input error.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n____________________________ test_median_odd_length ____________________________\n\n    def test_median_odd_length():\n>       assert stats.median([3, 1, 2]) == 2\nE       assert 1.5 == 2\nE        +  where 1.5 = <function median at 0x7f72a71d6700>([3, 1, 2])\nE        +    where <function median at 0x7f72a71d6700> = stats.median\n\ntests/test_issue_repro.py:5: AssertionError\n___________________________ test_median_even_length ____________________________\n\n    def test_median_even_length():\n>       assert stats.median([4, 1, 3, 2]) == 2.5\nE       assert 3 == 2.5\nE        +  where 3 = <function median at 0x7f72a71d6700>([4, 1, 3, 2])\nE        +    where <function median at 0x7f72a71d6700> = stats.median\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_median_odd_length - assert 1.5 == 2\nFAILED tests/test_issue_repro.py::test_median_even_length - assert 3 == 2.5\n2 failed in 0.31s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. The parity check in `median()` was inverted. Changing `n % 2 == 0` to `n % 2 == 1` fixes the root cause, so odd lengths return the middle element and even lengths average the two middle elements. No special-casing of the issue's input. I read the code and ran the suite: 82 tests pass. The `report.py` caller of `median` needs no change. The new tests in `tests/test_issue_repro.py` cover odd and even lengths, and no existing tests were modified or removed.\n\nNit: the diff includes many `__pycache__/*.pyc` files. Drop them from the commit and consider adding a `.gitignore` for them. They don't affect behaviour.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

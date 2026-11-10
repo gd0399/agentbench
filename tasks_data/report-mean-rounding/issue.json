@@ -1,0 +1,7 @@
+{
+  "number": 157,
+  "title": "summarize() rounds the mean to an integer",
+  "body": "**Describe the bug**\nCalling `report.summarize([1, 2, 3, 4])` returns `{'count': 4, 'mean': 2, 'median': 2.5, 'max': 4}`, but it should return `{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}`.\n\n**To reproduce**\n```python\nfrom toolkit import report\nprint(report.summarize([1, 2, 3, 4]))\n```\n\n**Expected behaviour**\nExpected: `{'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "mlopez",
+  "labels": []
+}

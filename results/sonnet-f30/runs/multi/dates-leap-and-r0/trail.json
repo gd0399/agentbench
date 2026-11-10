@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: in toolkit/dates.py is_leap_year, the inner `and` should be `or`. No conflicts with existing tests, so the next step is a fix.",
+   "instructions": "In toolkit/dates.py (line ~5), fix is_leap_year. Change `year % 4 == 0 and (year % 100 != 0 and year % 400 == 0)` to `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. Keep the change minimal. Then run tests/test_issue_repro.py. Both test_leap_years and test_feb_2024 should pass. Also run the full test suite to check for regressions. Check that 1900 is not a leap year, 2000 is, 2024 is, and 2023 is not. days_in_month and day_of_year should be fixed by this change, since they depend on is_leap_year. Don't edit the repro test unless it is wrong. Report the diff and the test results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "dates",
+  "summary": "2024 is not treated as a leap year"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "root_cause": "toolkit/dates.py line 5, is_leap_year: the expression `year % 4 == 0 and (year % 100 != 0 and year % 400 == 0)` has the inner `and` where it should be `or`. A year that isn't divisible by 400 can never pass, so 2024 returns False. The correct expression is `year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)`. days_in_month(2024, 2) returns 28 for the same reason, and day_of_year is also affected. No existing test or doc contradicts the expected behaviour.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n_______________________________ test_leap_years ________________________________\n\n    def test_leap_years():\n>       assert dates.is_leap_year(2024) is True\nE       assert False is True\nE        +  where False = <function is_leap_year at 0x7f4761c96660>(2024)\nE        +    where <function is_leap_year at 0x7f4761c96660> = dates.is_leap_year\n\ntests/test_issue_repro.py:5: AssertionError\n________________________________ test_feb_2024 _________________________________\n\n    def test_feb_2024():\n>       assert dates.days_in_month(2024, 2) == 29\nE       assert 28 == 29\nE        +  where 28 = <function days_in_month at 0x7f4761c96700>(2024, 2)\nE        +    where <function days_in_month at 0x7f4761c96700> = dates.days_in_month\n\ntests/test_issue_repro.py:12: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_leap_years - assert False is True\nFAILED tests/test_issue_repro.py::test_feb_2024 - assert 28 == 29\n2 failed in 0.34s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line change in `is_leap_year` fixes the root cause. The old condition `year % 100 != 0 and year % 400 == 0` could never be true for a year that is a multiple of 4 but not of 400. The new condition is the correct Gregorian rule.\n\nI ran the full suite: 83 passed. I also checked these years directly:\n- 1900 and 2100 return False.\n- 2000, 2400, 1600, 2024 and 4 return True.\n- 2023 returns False.\n- `days_in_month(2024, 2)` is 29 and `days_in_month(1900, 2)` is 28.\n\nThe new tests in `tests/test_issue_repro.py` are additive. No existing tests were changed or weakened.\n\nBefore merge, please drop the `__pycache__/*.pyc` files from the diff. They are build artifacts and shouldn't be committed. Consider adding `__pycache__/` to `.gitignore`. This is hygiene only and doesn't affect the fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

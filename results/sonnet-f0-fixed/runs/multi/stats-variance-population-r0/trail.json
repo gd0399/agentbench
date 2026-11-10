@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: in toolkit/stats.py variance(), the `if sample:` branch divides by n instead of n-1. It doesn't conflict with existing tests or docs, so the next step is a fix.",
+   "instructions": "In toolkit/stats.py variance(), lines 43-45, change the `if sample:` branch to return `total / (n - 1)` instead of `total / n`. Leave the population branch (sample=False) unchanged. Leave the existing ValueError for n<2 when sample is true unchanged. Make sure tests/test_issue_repro.py passes: variance([2,4,4,4,5,5,7,9]) should be approx 4.571428571428571. The existing tests must also pass: sample=False gives 4, and variance([1]) raises. Keep the diff minimal. If a docstring or changelog describes the divisor, update it to match."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "stats.variance([2, 4, 4, 4, 5, 5, 7, 9]) returns 4.0, which is the population variance (divides by n). The reporter expects the sample variance, 4.571428571428571, which divides by n-1. The likely fix is in toolkit/stats.py: change the divisor to n-1 and handle inputs with fewer than 2 values. The change alters results for existing callers, so check the docs and tests for the intended semantics. Consider adding a separate population variant."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py variance(), lines 43-45: the `if sample:` branch returns `total / n`, identical to the population branch. It should return `total / (n - 1)`. The function already has `sample=True` as the default and already raises ValueError for n<2 when sample is true, so only the divisor is wrong. The existing tests (population variance with sample=False == 4, and variance([1]) raising) stay consistent with the fix. The issue's request does not conflict with the tests or docs.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=1 failed=1 errors=0\nF.                                                                       [100%]\n=================================== FAILURES ===================================\n_____________________ test_sample_variance_uses_n_minus_1 ______________________\n\n    def test_sample_variance_uses_n_minus_1():\n>       assert stats.variance([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(4.571428571428571)\nE       assert 4.0 == 4.571428571428571 \u00b1 4.6e-06\nE         \nE         comparison failed\nE         Obtained: 4.0\nE         Expected: 4.571428571428571 \u00b1 4.6e-06\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_sample_variance_uses_n_minus_1 - asser...\n1 failed, 1 passed in 0.04s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. The sample branch of `variance` now divides by `n - 1`, which is the root cause. The population branch (`sample=False`) and the `n < 2` ValueError are unchanged. Nothing else in the repo calls `variance`, and `report.py` only uses mean and median, so no callers are affected. All 85 tests pass. The existing tests were not modified. The new `tests/test_issue_repro.py` covers the issue's example and checks that the population branch is unchanged.\n\nBefore merging, drop the `__pycache__/*.pyc` files from the commit. They are build artifacts, not part of the fix, and should be gitignored.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

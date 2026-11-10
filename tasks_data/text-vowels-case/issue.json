@@ -1,0 +1,7 @@
+{
+  "number": 124,
+  "title": "count_vowels ignores capital vowels",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.count_vowels('Education')` returns `4`. Expected: `5`.\n\nThanks for the great library!",
+  "author": "dev-dana",
+  "labels": []
+}

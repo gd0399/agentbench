@@ -1,0 +1,32 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..20d5559
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import money
++
++
++def test_split_bill_keeps_cents():
++    assert money.split_bill(100, 3) == 33.33
+diff --git a/toolkit/money.py b/toolkit/money.py
+index 7e2e8c5..b7f79dd 100644
+--- a/toolkit/money.py
++++ b/toolkit/money.py
+@@ -11,7 +11,7 @@ def split_bill(total, people, tip_percent=0):
+     if people <= 0:
+         raise ValueError("people must be positive")
+     with_tip = total * (1 + tip_percent / 100)
+-    return round(with_tip // people, 2)
++    return round(with_tip / people, 2)
+ 
+ 
+ def compound_interest(principal, rate, years, periods_per_year=1):

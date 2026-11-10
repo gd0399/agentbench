@@ -1,0 +1,84 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "researcher unavailable: work directly from the issue",
+   "instructions": "The researcher is unavailable: reproduce and localise the bug yourself first."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "escalate",
+   "reason": "coder and generalist both failed",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "all models failed for supervisor: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_01",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  },
+  {
+   "agent": "researcher",
+   "error": "ModelUnavailable: all models failed for researcher: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 're",
+   "attempt": 2,
+   "recovered_by": "coder"
+  },
+  {
+   "agent": "coder",
+   "error": "ModelUnavailable: all models failed for coder: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "supervisor",
+   "error": "all models failed for supervisor: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_01",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  },
+  {
+   "agent": "generalist",
+   "error": "ModelUnavailable: all models failed for generalist: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 're",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "researcher: FAILED -> coder",
+  "coder: FAILED -> generalist",
+  "generalist: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "median() returns a float for even lists"
+ },
+ "research": {
+  "reproduced": true,
+  "degraded": true,
+  "suspected_files": [],
+  "root_cause": "researcher unavailable; not yet investigated"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

@@ -1,0 +1,7 @@
+{
+  "number": 166,
+  "title": "word_count treats hyphenated words as one",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.word_count('state-of-the-art design')` returns `2`. Hyphenated words should count separately.\n\nExpected: `5`.\n\nThanks for the great library!",
+  "author": "t-nakamura",
+  "labels": []
+}

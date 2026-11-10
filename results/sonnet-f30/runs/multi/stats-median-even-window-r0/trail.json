@@ -1,0 +1,72 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "stats",
+  "summary": "report.summarize([1, 2, 3, 4]) returns median 3.5 instead of 2.5 for even-length data. The median calculation is likely wrong for even-length input. It probably averages the wrong pair of middle elements, or indexes incorrectly. The bug is probably in toolkit/stats.py (median), or in toolkit/report.py if summarize computes the median itself. Needs investigation and a regression test for even-length lists."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/stats.py line 18, in median(): for even-length input it returns (ordered[mid] + ordered[mid + 1]) / 2. It should average the two middle elements, ordered[mid - 1] and ordered[mid]. For [1,2,3,4], mid=2, so it averages 3 and 4 and gives 3.5 instead of 2.5. For length-2 input it would raise IndexError. report.summarize (toolkit/report.py line 9) just calls stats.median, so it is not at fault. Existing tests cover only odd-length and empty input, so they don't contradict the fix.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=2 errors=0\nFF                                                                       [100%]\n=================================== FAILURES ===================================\n__________________________ test_summarize_even_median __________________________\n\n    def test_summarize_even_median():\n>       assert report.summarize([1, 2, 3, 4]) == {'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}\nE       AssertionError: assert {'count': 4, ...3.5, 'max': 4} == {'count': 4, ...2.5, 'max': 4}\nE         \nE         Omitting 3 identical items, use -vv to show\nE         Differing items:\nE         {'median': 3.5} != {'median': 2.5}\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n_______________________________ test_median_even _______________________________\n\n    def test_median_even():\n>       assert stats.median([1, 2, 3, 4]) == 2.5\nE       assert 3.5 == 2.5\nE        +  where 3.5 = <function median at 0x7f4ec91d68e0>([1, 2, 3, 4])\nE        +    where <function median at 0x7f4ec91d68e0> = stats.median\n\ntests/test_issue_repro.py:9: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_summarize_even_median - AssertionError...\nFAILED tests/test_issue_repro.py::test_median_even - assert 3.5 == 2.5\n2 failed in 0.29s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The bug was in stats.median, which averaged ordered[mid] and ordered[mid+1] for even-length input. The one-line change to ordered[mid-1] and ordered[mid] fixes that root cause. summarize() just calls stats.median, so it is fixed too.\n\nI ran the full suite (84 passed). I also checked a few edge cases by hand: [1,2,3,4] gives 2.5, [5,1] gives 3.0, [1,1,1,1] gives 1.0, [1,2] gives 1.5, and an unsorted list with negatives gives 7.5. The odd-length and empty-input paths are unchanged. No existing tests were modified. The new tests in tests/test_issue_repro.py cover the issue's repro and the unsorted two-element case.\n\nTwo small things to clean up before merging:\n- The diff includes committed __pycache__/*.pyc files. Remove them from the commit and add a .gitignore entry for `__pycache__/`.\n- Optionally, fold the new tests into tests/test_toolkit.py next to test_median_odd instead of keeping a separate \"issue_repro\" file.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

@@ -1,0 +1,77 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..ad68592
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..26394b6
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..ec897ab
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index e3537d8..23316a5 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -176,6 +176,19 @@ def test_last_n():
+ def test_last_n_zero():
+     assert seq.last_n([1, 2, 3], 0) == []
+ 
++def test_sliding_window_includes_final_window():
++    assert seq.sliding_window([1, 2, 3, 4], 3) == [(1, 2, 3), (2, 3, 4)]
++
++def test_sliding_window_exact_size():
++    assert seq.sliding_window([1, 2, 3], 3) == [(1, 2, 3)]
++
++def test_sliding_window_size_too_large():
++    assert seq.sliding_window([1, 2], 3) == []
++
++def test_sliding_window_bad():
++    with pytest.raises(ValueError):
++        seq.sliding_window([1, 2, 3], 0)
++
+ def test_discount():
+     assert money.apply_discount(80.0, 25) == 60.0
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..49d77ec
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..5a08eac
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..b0bacba
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..43625d5
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..b7f271c
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..4a3dbc5
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..27b1471
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/seq.py b/toolkit/seq.py
+index b53f2ab..47c7427 100644
+--- a/toolkit/seq.py
++++ b/toolkit/seq.py
+@@ -39,7 +39,7 @@ def rotate(items, k):
+ def sliding_window(items, size):
+     if size <= 0:
+         raise ValueError("size must be positive")
+-    return [tuple(items[i:i + size]) for i in range(len(items) - size)]
++    return [tuple(items[i:i + size]) for i in range(len(items) - size + 1)]
+ 
+ 
+ def binary_search(items, target):

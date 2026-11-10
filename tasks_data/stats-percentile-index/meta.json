@@ -1,0 +1,20 @@
+{
+  "id": "stats-percentile-index",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "stats.percentile([15, 20, 35, 40, 50], 40)",
+  "expected": "20",
+  "actual": {
+    "ok": true,
+    "repr": "35"
+  },
+  "failing_hidden_tests": [
+    "test_percentile_max",
+    "test_percentile_mid",
+    "test_percentile_rounds_up"
+  ],
+  "visible_tests": 81
+}

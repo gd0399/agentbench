@@ -1,0 +1,7 @@
+{
+  "number": 159,
+  "title": "top_words returns the least common words",
+  "body": "### What happened?\n`report.top_words('b a b c a b', 2)` returns `['c', 'a']`.\n\n### What did you expect?\nIt should return `['b', 'a']` (expected: `['b', 'a']`).\n\n### Version\nlatest main",
+  "author": "octocat",
+  "labels": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "money-split-floor",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/money.py",
+  "component": "money",
+  "difficulty": "easy",
+  "expr": "money.split_bill(100, 3)",
+  "expected": "33.33",
+  "actual": {
+    "ok": true,
+    "repr": "33.0"
+  },
+  "failing_hidden_tests": [
+    "test_split_bill_uneven"
+  ],
+  "visible_tests": 83
+}

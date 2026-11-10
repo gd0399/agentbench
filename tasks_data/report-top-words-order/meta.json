@@ -1,0 +1,18 @@
+{
+  "id": "report-top-words-order",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/report.py",
+  "component": "report",
+  "difficulty": "easy",
+  "expr": "report.top_words('b a b c a b', 2)",
+  "expected": "['b', 'a']",
+  "actual": {
+    "ok": true,
+    "repr": "['c', 'a']"
+  },
+  "failing_hidden_tests": [
+    "test_top_words"
+  ],
+  "visible_tests": 83
+}

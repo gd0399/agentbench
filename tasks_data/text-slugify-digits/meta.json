@@ -1,0 +1,18 @@
+{
+  "id": "text-slugify-digits",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "easy",
+  "expr": "text.slugify('Top 10 Tips')",
+  "expected": "'top-10-tips'",
+  "actual": {
+    "ok": true,
+    "repr": "'top-tips'"
+  },
+  "failing_hidden_tests": [
+    "test_slugify_digits"
+  ],
+  "visible_tests": 83
+}

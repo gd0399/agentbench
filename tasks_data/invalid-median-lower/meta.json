@@ -1,0 +1,16 @@
+{
+  "id": "invalid-median-lower",
+  "kind": "invalid",
+  "category": "invalid",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "n/a",
+  "expr": "stats.median([1, 2, 3, 4])",
+  "expected": "2",
+  "actual": {
+    "ok": true,
+    "repr": "2.5"
+  },
+  "failing_hidden_tests": [],
+  "visible_tests": 84
+}

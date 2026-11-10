@@ -1,0 +1,80 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause (regex [^a-z]+ in toolkit/text.py line 7 strips digits). No conflict with existing tests. Ready for a fix.",
+   "instructions": "In toolkit/text.py slugify (line ~7), change re.sub(r\"[^a-z]+\", \"-\", s) to re.sub(r\"[^a-z0-9]+\", \"-\", s). Add a regression test to tests/test_toolkit.py asserting text.slugify('Top 10 Tips') == 'top-10-tips' (the repro test in tests/test_issue_repro.py can be moved or reused). Ensure the existing test_slugify ('Hello, World!') still passes and run the full test suite. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "The reviewer confirmed the regex fix is correct and the tests pass. The only objection is that the patch isn't clean. The diff includes committed __pycache__/*.pyc binaries and a duplicate repro test file.",
+   "instructions": "Keep the fix in toolkit/text.py (`[^a-z0-9]+`) and the regression test `test_slugify_keeps_digits` in tests/test_toolkit.py. Clean up the patch:\n1. Remove all __pycache__/*.pyc files from the diff. Delete them or untrack them, and don't commit them. Adding a .gitignore entry for `__pycache__/` and `*.pyc` is fine if the repo has none.\n2. Remove the temporary tests/test_issue_repro.py. It duplicates the regression test now in tests/test_toolkit.py.\n3. Re-run the full suite and confirm it still passes.\n4. Make sure the final diff touches only toolkit/text.py and tests/test_toolkit.py, plus an optional .gitignore.\nThen report the updated diff summary."
+  },
+  {
+   "step": 5,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 6,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "text",
+  "summary": "text.slugify drops digits: slugify('Top 10 Tips') returns 'top-tips' instead of 'top-10-tips'. Likely the character-filtering regex in toolkit/text.py only keeps letters (e.g. [a-z]) and should also keep 0-9. Needs a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py line 7 in slugify: re.sub(r\"[^a-z]+\", \"-\", s) treats every non-a-z character, including digits 0-9, as a separator. Digits are replaced with \"-\" and then collapsed. Fix: use r\"[^a-z0-9]+\". The existing test (test_slugify, 'Hello, World!') is unaffected, and nothing documents that digits should be stripped.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________ test_slugify_keeps_digits ___________________________\n\n    def test_slugify_keeps_digits():\n>       assert text.slugify('Top 10 Tips') == 'top-10-tips'\nE       AssertionError: assert 'top-tips' == 'top-10-tips'\nE         \nE         - top-10-tips\nE         ?    ---\nE         + top-tips\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_slugify_keeps_digits - AssertionError:...\n1 failed in 0.22s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The one-line change from `[^a-z]+` to `[^a-z0-9]+` fixes the root cause. I checked 'Top 10 Tips', '2024 Report', 'a1b2', '10' and whitespace-only input, and all give sensible slugs. The full suite passes (84 tests). The existing test is untouched and the new regression test is appropriate. The diff has no test deletions or weakened assertions. The new .gitignore is harmless but unrelated to the issue. Non-ASCII letters such as '\u00e9' are still dropped ('Caf\u00e9 5' becomes 'caf-5'). That behaviour was already there and is out of scope for this issue.",
+  "reviewer": "reviewer",
+  "attempt": 2
+ },
+ "resolution": null
+}

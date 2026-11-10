@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause: the guard `if window < 0` in toolkit/stats.py moving_average should be `window <= 0`. No conflicts with tests or docs. The next step is a fix.",
+   "instructions": "In toolkit/stats.py, moving_average (around line 62), change the guard from `if window < 0` to `if window <= 0`. Keep the existing \"window must be positive\" ValueError message. Keep the change minimal. Optionally also reject non-integer windows with a ValueError, but only if that doesn't break existing callers or tests, which use windows 2 and 3. Add a regression test to tests/test_toolkit.py asserting that stats.moving_average([1, 2], 0) raises ValueError. Include a negative-window case too. The repro test tests/test_issue_repro.py should pass after the fix. Run the full test suite and report the results."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "stats",
+  "summary": "stats.moving_average([1, 2], 0) raises ZeroDivisionError rather than ValueError. The function needs input validation: reject window <= 0 (and probably non-integer windows) with a ValueError and a clear message. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 62, moving_average: the guard is `if window < 0`, which lets window == 0 through (off-by-one boundary; should be `window <= 0`, matching the \"window must be positive\" message). With window=0 the loop runs and line 66 divides by window, raising ZeroDivisionError. No docs or tests conflict with the requested behaviour; existing tests only use window 2 and 3.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n______________ test_moving_average_zero_window_raises_valueerror _______________\n\n    def test_moving_average_zero_window_raises_valueerror():\n        with pytest.raises(ValueError):\n>           stats.moving_average([1, 2], 0)\n\ntests/test_issue_repro.py:7: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [1, 2], window = 0\n\n    def moving_average(values, window):\n        if window < 0:\n            raise ValueError(\"window must be positive\")\n        out = []\n        for i in range(len(values) - window + 1):\n>           out.append(sum(values[i:i + window]) / window)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           ZeroDivisionError: division by zero\n\ntoolkit/stats.py:66: ZeroDivisionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_moving_average_zero_window_raises_valueerror\n1 failed in 0.02s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause is the guard `window < 0`, which let 0 through to `/ window`. Changing it to `window <= 0` fixes that for every non-positive window, not only the repro input. The change is one line and the error message already said \"must be positive\". I ran the suite: 86 passed. No existing tests were modified or removed, and the new tests only add coverage for window=0 and window=-1.\n\nCleanup to do before merging:\n- The diff includes many `__pycache__/*.pyc` files. They look like build artifacts, so drop them from the commit and add `__pycache__/` to `.gitignore`.\n- `tests/test_issue_repro.py` duplicates `test_moving_average_zero_window` in `tests/test_toolkit.py`. Delete the repro file and keep the test in `test_toolkit.py`.\n\nNeither item changes behaviour.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

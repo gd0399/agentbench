@@ -1,0 +1,7 @@
+{
+  "number": 128,
+  "title": "flatten ignores tuples",
+  "body": "### What happened?\n`seq.flatten([1, (2, 3)])` returns `[1, (2, 3)]`.\n\n### What did you expect?\nIt should return `[1, 2, 3]` (expected: `[1, 2, 3]`).\n\n### Version\nlatest main",
+  "author": "sven.o",
+  "labels": []
+}

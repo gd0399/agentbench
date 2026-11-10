@@ -1,0 +1,90 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..92704cd
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..7e4a318
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..4663474
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..915b31c
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,9 @@
++from toolkit import stats
++
++
++def test_percentile_nearest_rank():
++    assert stats.percentile([15, 20, 35, 40, 50], 40) == 20
++
++
++def test_percentile_100():
++    assert stats.percentile([15, 20, 35, 40, 50], 100) == 50
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 01cff45..c291141 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -40,6 +40,17 @@ def test_variance_too_small():
+ def test_percentile_zero():
+     assert stats.percentile([15, 20, 35, 40, 50], 0) == 15
+ 
++def test_percentile_40():
++    assert stats.percentile([15, 20, 35, 40, 50], 40) == 20
++
++def test_percentile_100():
++    assert stats.percentile([15, 20, 35, 40, 50], 100) == 50
++
++def test_percentile_other_values():
++    data = [15, 20, 35, 40, 50]
++    assert [stats.percentile(data, p) for p in (20, 30, 50, 60, 80, 99)] == [15, 20, 35, 35, 40, 50]
++    assert stats.percentile([7], 100) == 7
++
+ def test_percentile_bounds():
+     with pytest.raises(ValueError):
+         stats.percentile([1, 2], 101)
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..6f37336
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..a20d431
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..bc0feff
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..99fc014
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..d11cd2e
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..f7aa1e6
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..04b6ad8
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/stats.py b/toolkit/stats.py
+index 02a9ef9..98df0d4 100644
+--- a/toolkit/stats.py
++++ b/toolkit/stats.py
+@@ -55,7 +55,7 @@ def percentile(values, p):
+     if p == 0:
+         return ordered[0]
+     rank = -(-p * len(ordered) // 100)
+-    return ordered[int(rank)]
++    return ordered[int(rank) - 1]
+ 
+ 
+ def moving_average(values, window):

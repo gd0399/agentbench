@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause in toolkit/report.py line 26, where tax is computed on the undiscounted subtotal. No patch exists yet, so the coder should write the fix.",
+   "instructions": "In toolkit/report.py, function invoice_total (around line 26), compute tax on the discounted amount. Change `money.tax(subtotal, tax_rate)` to `money.tax(discounted, tax_rate)`. The total is then discounted + tax(discounted). Don't change money.apply_discount or money.tax, which are correct. Run tests/test_issue_repro.py, which should give 24.75 for [(2, 10.0), (1, 5.0)] with discount_percent=10 and tax_rate=0.1. Also run the full test suite to check for regressions. Keep the diff minimal and keep the repro test."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.invoice_total applies tax before the discount (or otherwise miscomputes the order). For items [(2, 10.0), (1, 5.0)] with discount_percent=10 and tax_rate=0.1, it returns 25.0 where 24.75 is expected. Subtotal 25.0, minus 10% discount gives 22.5, plus 10% tax gives 24.75. The discount should be applied to the subtotal first, then tax on the discounted amount. Check toolkit/report.py, and possibly helpers in toolkit/money.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/report.py line 26, in invoice_total: tax is computed on the undiscounted subtotal (`money.tax(subtotal, tax_rate)`) and added to the discounted amount. For the issue's input this gives 22.5 + 2.5 = 25.0 instead of 22.5 + 2.25 = 24.75. The fix is `money.tax(discounted, tax_rate)`, or equivalently `discounted + tax(discounted)`. money.apply_discount and money.tax are correct, and no existing test contradicts this.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________ test_invoice_tax_after_discount ________________________\n\n    def test_invoice_tax_after_discount():\n>       assert report.invoice_total([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1) == 24.75\nE       assert 25.0 == 24.75\nE        +  where 25.0 = <function invoice_total at 0x7f25dcc97ba0>([(2, 10.0), (1, 5.0)], discount_percent=10, tax_rate=0.1)\nE        +    where <function invoice_total at 0x7f25dcc97ba0> = report.invoice_total\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_invoice_tax_after_discount - assert 25...\n1 failed in 0.10s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line fix in `report.invoice_total` is correct. It now computes tax on the discounted amount, so the issue example gives 22.5 + 2.25 = 24.75. This fixes the cause rather than special-casing the input. `money.tax` and `money.apply_discount` are unchanged, and the discount and tax defaults of 0 still work. All 84 tests pass. The new regression test in `tests/test_issue_repro.py` matches the issue, and no existing tests were modified.\n\nPlease drop the `__pycache__/*.pyc` files from the diff before merging. They are build artifacts from running the tests. Adding a `.gitignore` for `__pycache__/` would stop this happening again. This doesn't affect the logic of the fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

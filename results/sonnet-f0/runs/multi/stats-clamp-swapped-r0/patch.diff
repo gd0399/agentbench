@@ -1,0 +1,85 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..3644cfc
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..f336048
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..5593d06
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..21bb453
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,9 @@
++from toolkit import stats
++
++
++def test_clamp_in_range():
++    assert stats.clamp(5, 0, 10) == 5
++
++
++def test_clamp_high():
++    assert stats.clamp(15, 0, 10) == 10
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 6bc7bc1..8cbb2dc 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -66,6 +66,15 @@ def test_moving_average_bad():
+ def test_clamp_low():
+     assert stats.clamp(-3, 0, 10) == 0
+ 
++def test_clamp_in_range():
++    assert stats.clamp(5, 0, 10) == 5
++
++def test_clamp_high():
++    assert stats.clamp(15, 0, 10) == 10
++
++def test_clamp_low_negative():
++    assert stats.clamp(-5, 0, 10) == 0
++
+ def test_clamp_equal_bounds():
+     assert stats.clamp(3, 3, 3) == 3
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..893f5a9
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..95c9991
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..188420e
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..02d5b3d
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..a8f5102
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..6cbad74
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..0535c51
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/stats.py b/toolkit/stats.py
+index 8b4d2f1..703899e 100644
+--- a/toolkit/stats.py
++++ b/toolkit/stats.py
+@@ -70,4 +70,4 @@ def moving_average(values, window):
+ def clamp(x, lo, hi):
+     if lo > hi:
+         raise ValueError("lo must be <= hi")
+-    return min(lo, max(x, hi))
++    return min(hi, max(x, lo))

@@ -1,0 +1,80 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug is reproduced with a clear root cause in toolkit/text.py camel_to_snake; no conflicts with existing tests. Ready for a fix.",
+   "instructions": "Fix camel_to_snake in toolkit/text.py (around lines 48-54) so it only prepends \"_\" before an uppercase char when its index i > 0. 'Value' -> 'value'; existing lowerCamel behavior (e.g. 'fooBar' -> 'foo_bar') must be unchanged. Add a regression test in tests/test_toolkit.py asserting text.camel_to_snake('Value') == 'value' (you can base it on tests/test_issue_repro.py). Run the full test suite to confirm all pass, and keep the diff minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "coder",
+   "reason": "The reviewer confirmed the fix in toolkit/text.py is correct, but the patch isn't mergeable because the diff includes unrelated files. A coder can fix that.",
+   "instructions": "Keep the source change in toolkit/text.py (`if c.isupper() and i > 0`) and the regression test in tests/test_toolkit.py. Clean up the patch:\n1. Remove all __pycache__/*.pyc files from the diff. Delete them from the working tree and the index, and make sure none are tracked or staged. Add `__pycache__/` and `*.pyc` to .gitignore if it doesn't already have them.\n2. Remove the scratch repro file tests/test_issue_repro.py. It duplicates the regression test now in tests/test_toolkit.py.\n3. Rerun the full test suite. Then regenerate the diff so it touches only toolkit/text.py, tests/test_toolkit.py, and optionally .gitignore. Update patch.files and patch.summary to match.\n4. Also add a blank-line fix in tests/test_toolkit.py if needed, so the new test has two blank lines before it, matching PEP8 and the surrounding style."
+  },
+  {
+   "step": 5,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 6,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.camel_to_snake('Value') returns '_value' instead of 'value': a leading underscore is added when the input starts with an uppercase letter. The function should not prefix an underscore before the first character. The likely fix is in toolkit/text.py. Add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py"
+  ],
+  "root_cause": "toolkit/text.py camel_to_snake (lines 48-54): the loop appends \"_\" for every uppercase char, including index 0, so 'Value' becomes '_value'. It should only add \"_\" when i > 0. The existing test only covers lowerCamel input, so it does not conflict.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n__________________ test_camel_to_snake_no_leading_underscore ___________________\n\n    def test_camel_to_snake_no_leading_underscore():\n>       assert text.camel_to_snake('Value') == 'value'\nE       AssertionError: assert '_value' == 'value'\nE         \nE         - value\nE         + _value\nE         ? +\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_camel_to_snake_no_leading_underscore\n1 failed in 0.25s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The fix is correct and minimal. `c.isupper() and i > 0` addresses the root cause, which is that the underscore was added at index 0. 'Value' now gives 'value', and 'A', '' and 'FooBar' behave correctly. All 84 tests pass, and the existing test is unchanged. The new regression test covers the issue case.\n\nTwo small notes, neither blocking:\n- The `.gitignore` is unrelated to the issue. It's harmless, but it would be cleaner as a separate commit.\n- Acronyms such as 'HTTPResponse' still give 'h_t_t_p_response'. That behaviour was already there and is outside this issue.",
+  "reviewer": "reviewer",
+  "attempt": 2
+ },
+ "resolution": null
+}

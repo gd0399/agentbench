@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause; no patch exists yet, so the coder should write the fix.",
+   "instructions": "Fix variance() in toolkit/stats.py (around line 37). Replace the faulty guard `if n < 2 or sample:` so the logic is: if n == 0 -> raise ValueError with an \"empty sequence\" message; elif sample and n < 2 -> raise ValueError(\"sample variance needs at least two values\"); otherwise compute the variance (divide by n-1 if sample else n). Make sure the n == 0 check is reachable (put it first). Keep the existing behavior for population variance and variance([1]) raising. Verify tests/test_issue_repro.py passes (variance([1,2,3]) == 1.0) and that the existing test suite still passes. Keep the change minimal."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "high",
+  "component": "stats",
+  "summary": "variance() raises for perfectly valid input"
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "root_cause": "toolkit/stats.py line 37 in variance(): the guard `if n < 2 or sample:` should be `if sample and n < 2:`. Because of the `or sample`, every call with the default sample=True raises ValueError, even for valid input like [1,2,3]. Also, with sample=False and n<2 (including n==0) it raises the wrong \"sample variance\" message, and the later `n == 0` check is unreachable. The intended logic is: n==0 -> \"empty sequence\" error; sample and n<2 -> error; otherwise compute. The existing tests (population variance, variance([1]) raising) are consistent with the fix and don't conflict.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________ test_sample_variance_valid_input _______________________\n\n    def test_sample_variance_valid_input():\n>       assert stats.variance([1, 2, 3]) == 1.0\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:5: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvalues = [1, 2, 3], sample = True\n\n    def variance(values, sample=True):\n        n = len(values)\n        if n < 2 or sample:\n>           raise ValueError(\"sample variance needs at least two values\")\nE           ValueError: sample variance needs at least two values\n\ntoolkit/stats.py:38: ValueError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_sample_variance_valid_input - ValueErr...\n1 failed in 0.29s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause was the inverted guard `if n < 2 or sample: raise`. It made every sample=True call raise, and it made the empty check unreachable. The new guard is `n == 0` first, then `sample and n < 2`. That is correct and minimal.\n\nChecks I ran:\n- variance([1,2,3]) returns 1.0.\n- variance([1,2,3,4], sample=False) returns 1.25, and variance([5], sample=False) returns 0.0.\n- variance([5]) raises \"needs at least two values\". variance([]) raises \"empty sequence\" for both sample modes.\n- All 84 tests pass. The existing tests are untouched, and the regression test is new and sensible.\n\nNit: the diff includes committed __pycache__/*.pyc files. Please drop them and add them to .gitignore before merging. They are not part of the fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

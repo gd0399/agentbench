@@ -1,0 +1,78 @@
+diff --git a/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..32976b7
+Binary files /dev/null and b/__pycache__/conftest.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..ab7beea
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc
+new file mode 100644
+index 0000000..d12a4ff
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-311-pytest-9.2.0.pyc differ
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..9fba633
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,5 @@
++from toolkit import text
++
++
++def test_title_case_first_word_capitalized():
++    assert text.title_case('the lord of the rings') == 'The Lord of the Rings'
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 66efccc..6dff732 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -109,6 +109,9 @@ def test_palindrome_false():
+ def test_title_case_mixed():
+     assert text.title_case('hELLO wORLD') == 'Hello World'
+ 
++def test_title_case_first_word_capitalized():
++    assert text.title_case('the lord of the rings') == 'The Lord of the Rings'
++
+ def test_count_vowels():
+     assert text.count_vowels('Education') == 5
+ 
+diff --git a/toolkit/__pycache__/__init__.cpython-311.pyc b/toolkit/__pycache__/__init__.cpython-311.pyc
+new file mode 100644
+index 0000000..4378c26
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-311.pyc b/toolkit/__pycache__/dates.cpython-311.pyc
+new file mode 100644
+index 0000000..e92644f
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-311.pyc b/toolkit/__pycache__/money.cpython-311.pyc
+new file mode 100644
+index 0000000..3119ea5
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-311.pyc b/toolkit/__pycache__/report.cpython-311.pyc
+new file mode 100644
+index 0000000..34ce225
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-311.pyc b/toolkit/__pycache__/seq.cpython-311.pyc
+new file mode 100644
+index 0000000..7ed8ae3
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-311.pyc b/toolkit/__pycache__/stats.cpython-311.pyc
+new file mode 100644
+index 0000000..86769c0
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-311.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-311.pyc b/toolkit/__pycache__/text.cpython-311.pyc
+new file mode 100644
+index 0000000..7873f21
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-311.pyc differ
+diff --git a/toolkit/text.py b/toolkit/text.py
+index 7b32b71..fe6e86b 100644
+--- a/toolkit/text.py
++++ b/toolkit/text.py
+@@ -29,7 +29,7 @@ def title_case(s, minor=("a", "an", "the", "of", "and", "or", "in")):
+     words = s.split()
+     out = []
+     for i, w in enumerate(words):
+-        if w.lower() in minor:
++        if i > 0 and w.lower() in minor:
+             out.append(w.lower())
+         else:
+             out.append(w[:1].upper() + w[1:].lower())

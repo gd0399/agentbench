@@ -1,0 +1,21 @@
+{
+  "id": "stats-median-parity",
+  "kind": "bug",
+  "category": "operator",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "easy",
+  "expr": "stats.median([3, 1, 2])",
+  "expected": "2",
+  "actual": {
+    "ok": true,
+    "repr": "1.5"
+  },
+  "failing_hidden_tests": [
+    "test_median_even",
+    "test_median_odd",
+    "test_summarize",
+    "test_summarize_unsorted"
+  ],
+  "visible_tests": 80
+}

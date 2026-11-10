@@ -1,0 +1,7 @@
+{
+  "number": 111,
+  "title": "moving_average drops the last window",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.moving_average([2, 4, 6], 3)` returns `[]`. Expected: `[4.0]`.\n\nThanks for the great library!",
+  "author": "octocat",
+  "labels": []
+}

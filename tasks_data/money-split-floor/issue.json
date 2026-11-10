@@ -1,0 +1,7 @@
+{
+  "number": 142,
+  "title": "split_bill loses cents",
+  "body": "**Describe the bug**\nCalling `money.split_bill(100, 3)` returns `33.0`, but it should return `33.33`.\n\n**To reproduce**\n```python\nfrom toolkit import money\nprint(money.split_bill(100, 3))\n```\n\n**Expected behaviour**\nExpected: `33.33`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "dev-dana",
+  "labels": []
+}

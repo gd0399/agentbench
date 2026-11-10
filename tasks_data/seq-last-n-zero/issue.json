@@ -1,0 +1,7 @@
+{
+  "number": 139,
+  "title": "last_n(items, 0) returns everything",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`seq.last_n([1, 2, 3], 0)` returns `[1, 2, 3]`. Expected: `[]`.\n\nThanks for the great library!",
+  "author": "sven.o",
+  "labels": []
+}

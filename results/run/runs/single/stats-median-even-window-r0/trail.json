@@ -1,0 +1,27 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "open_pr: ok"
+ ],
+ "triage": null,
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_issue_repro _______________________________\n\n    def test_issue_repro():\n>       assert report.summarize([1, 2, 3, 4]) == {'count': 4, 'mean': 2.5, 'median': 2.5, 'max': 4}\nE       AssertionError: assert {'count': 4, ...3.5, 'max': 4} == {'count': 4, ...2.5, 'max': 4}\nE         \nE         Omitting 3 identical items, use -vv to show\nE         Differing items:\nE         {'median': 3.5} != {'median': 2.5}\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:6: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_issue_repro - AssertionError: assert {...\n1 failed in 0.05s\n",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "SBFL suspicious lines: toolkit/stats.py:18 (1.00), toolkit/report.py:6 (0.71), toolkit/report.py:7 (0.71), toolkit/report.py:8 (0.71), toolkit/report.py:9 (0.71)"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier"
+ },
+ "resolution": "fixed"
+}

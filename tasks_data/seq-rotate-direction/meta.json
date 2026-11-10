@@ -1,0 +1,19 @@
+{
+  "id": "seq-rotate-direction",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/seq.py",
+  "component": "seq",
+  "difficulty": "hard",
+  "expr": "seq.rotate([1, 2, 3, 4, 5], 2)",
+  "expected": "[4, 5, 1, 2, 3]",
+  "actual": {
+    "ok": true,
+    "repr": "[3, 4, 5, 1, 2]"
+  },
+  "failing_hidden_tests": [
+    "test_rotate",
+    "test_rotate_wrap"
+  ],
+  "visible_tests": 82
+}

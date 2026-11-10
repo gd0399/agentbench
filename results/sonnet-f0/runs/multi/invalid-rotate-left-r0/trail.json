@@ -1,0 +1,42 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "escalate",
+   "reason": "The research shows rotate() deliberately rotates right. This is documented in the docstring (\"Rotate right by k positions\") and covered by the existing tests test_rotate and test_rotate_wrap. The issue is a design or documentation disagreement, not a clear bug. Flipping the direction would break those tests and change behavior for current users, so a maintainer should decide whether to change the behavior, add a rotate_left or a direction parameter, or just clarify the docs.",
+   "instructions": "Hand to a human maintainer. Summary: seq.rotate([1,2,3],1) returns [3,1,2] by design (right rotation, documented and tested in tests/test_toolkit.py). The reporter expects left-rotation semantics. Options: (1) keep the behavior and clarify the docs, replying to the reporter; (2) add a rotate_left function or a direction parameter, which is backward compatible; (3) flip the default as a breaking change, which would require updating test_rotate and test_rotate_wrap. The repro test tests/test_issue_repro.py encodes the reporter's expectation and conflicts with the existing tests."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.rotate([1, 2, 3], 1) returns [3, 1, 2] (rotates right) but the reporter expects [2, 3, 1] (rotate left: first item moves to the end). The rotation direction in toolkit/seq.py appears to be reversed. Check the existing tests and the docs/README for the intended direction before changing it, since flipping it would change behavior for current users."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py",
+   "tests/test_toolkit.py"
+  ],
+  "root_cause": "toolkit/seq.py:31-36 rotate() deliberately rotates RIGHT: `items[-k:] + items[:-k]`, with docstring \"Rotate right by k positions.\" The reporter expects a left rotation. Existing tests assert right rotation: test_rotate ([1,2,3,4,5],2 -> [4,5,1,2,3]) and test_rotate_wrap ([1,2,3],4 -> [3,1,2]). The repro test fails as the issue describes, but the current behaviour is documented and tested, so this is a design or documentation disagreement rather than a bug. Flipping the direction would break those tests and change behaviour for existing users.",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n___________________________ test_rotate_left_by_one ____________________________\n\n    def test_rotate_left_by_one():\n>       assert seq.rotate([1, 2, 3], 1) == [2, 3, 1]\nE       assert [3, 1, 2] == [2, 3, 1]\nE         \nE         At index 0 diff: 3 != 2\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_rotate_left_by_one - assert [3, 1, 2] ...\n1 failed in 0.06s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

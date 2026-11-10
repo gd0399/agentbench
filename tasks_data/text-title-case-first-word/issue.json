@@ -1,0 +1,7 @@
+{
+  "number": 121,
+  "title": "title_case lowercases the first word",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`text.title_case('the lord of the rings')` returns `'the Lord of the Rings'`. Expected: `'The Lord of the Rings'`.\n\nThanks for the great library!",
+  "author": "kwame-a",
+  "labels": []
+}

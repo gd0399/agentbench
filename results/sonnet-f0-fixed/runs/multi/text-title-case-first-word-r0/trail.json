@@ -1,0 +1,80 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Bug reproduced and root cause identified; no patch yet. Coder should implement the fix.",
+   "instructions": "In toolkit/text.py title_case (around lines 31-35), change the minor-word condition to `if i > 0 and w.lower() in minor` so the first word is always capitalized. Add a regression test in tests/test_toolkit.py: assert text.title_case('the lord of the rings') == 'The Lord of the Rings' (can be based on tests/test_issue_repro.py, then remove the repro file if it's redundant). Verify existing tests still pass, including test_title_case_mixed ('hELLO wORLD'). Also check toolkit/report.py:30, which uses title_case, and confirm no report tests break from the changed behavior."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "verifier",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 5,
+   "src": "verifier",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "reviewer",
+   "error": "ModelUnavailable: all models failed for reviewer: AnthropicInvalidRequestError(\"Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'requ",
+   "attempt": 2,
+   "recovered_by": "verifier"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: FAILED -> verifier",
+  "verifier: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "low",
+  "component": "text",
+  "summary": "text.title_case('the lord of the rings') returns 'the Lord of the Rings' instead of 'The Lord of the Rings'. The first word is lowercased because it is treated as a small word (e.g. 'the'). The first word should always be capitalized, and small words should stay lowercase only when they are not first. Fix in toolkit/text.py and add a regression test in tests/test_toolkit.py."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/text.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/text.py title_case (lines 31-35): the loop enumerates words but never uses the index `i`. The condition `if w.lower() in minor` lowercases minor words, including the first word. It should be `if i > 0 and w.lower() in minor`. The existing test test_title_case_mixed ('hELLO wORLD') is unaffected. The same function is used by report.py:30.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________ test_title_case_first_word_capitalized ____________________\n\n    def test_title_case_first_word_capitalized():\n>       assert text.title_case('the lord of the rings') == 'The Lord of the Rings'\nE       AssertionError: assert 'the Lord of the Rings' == 'The Lord of the Rings'\nE         \nE         - The Lord of the Rings\nE         ? ^\nE         + the Lord of the Rings\nE         ? ^\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_title_case_first_word_capitalized - As...\n1 failed in 0.02s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "all checks pass",
+  "reviewer": "verifier",
+  "attempt": 1
+ },
+ "resolution": null
+}

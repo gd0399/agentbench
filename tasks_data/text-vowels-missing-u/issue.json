@@ -1,0 +1,7 @@
+{
+  "number": 123,
+  "title": "count_vowels misses some vowels",
+  "body": "**Describe the bug**\nCalling `text.count_vowels('Education')` returns `4`, but it should return `5`.\n\n**To reproduce**\n```python\nfrom toolkit import text\nprint(text.count_vowels('Education'))\n```\n\n**Expected behaviour**\nExpected: `5`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "octocat",
+  "labels": []
+}

@@ -1,0 +1,20 @@
+{
+  "id": "dates-leap-and",
+  "kind": "bug",
+  "category": "operator",
+  "file": "toolkit/dates.py",
+  "component": "dates",
+  "difficulty": "easy",
+  "expr": "dates.is_leap_year(2024)",
+  "expected": "True",
+  "actual": {
+    "ok": true,
+    "repr": "False"
+  },
+  "failing_hidden_tests": [
+    "test_day_of_year_leap",
+    "test_days_in_feb_leap",
+    "test_leap_years"
+  ],
+  "visible_tests": 81
+}

@@ -1,0 +1,64 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and identified the root cause (toolkit/money.py line 21: `n = years` should be `n = years * periods_per_year`). No conflicts with existing tests. Ready for a fix.",
+   "instructions": "In toolkit/money.py, compound_interest, line 21: change `n = years` to `n = years * periods_per_year` so the exponent is n*t (rate is already divided by periods_per_year on line 20). Keep the default periods_per_year=1 behavior unchanged (existing test expecting 1102.5 must still pass). Ensure rounding to 2 decimals matches existing behavior so compound_interest(1000, 0.12, 1, 12) == 1126.83. Keep the regression test tests/test_issue_repro.py::test_compound_interest_periods_per_year (move or merge it into the main money tests if appropriate). Run the full test suite and report results. Make a minimal change only."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "money",
+  "summary": "money.compound_interest(1000, 0.12, 1, 12) returns 1010.0 instead of the expected 1126.83. The periods_per_year argument appears to be ignored. The correct formula is P*(1+r/n)^(n*t). 1000*(1.01)^12 = 1126.83. The returned 1010.0 looks like one period of 1% interest, so the exponent probably doesn't include n*t. Fix in toolkit/money.py and add a regression test."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py"
+  ],
+  "root_cause": "toolkit/money.py compound_interest, line 21: `n = years` should be `n = years * periods_per_year`. The rate is already divided by periods_per_year on line 20, but the exponent is not multiplied by it. So 1000*(1.01)^1 = 1010.0 instead of 1000*(1.01)^12 = 1126.83. The default periods_per_year=1 case (existing test, 1102.5) is unaffected by the fix.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=1 failed=1 errors=0\nF.                                                                       [100%]\n=================================== FAILURES ===================================\n___________________ test_compound_interest_periods_per_year ____________________\n\n    def test_compound_interest_periods_per_year():\n>       assert money.compound_interest(1000, 0.12, 1, 12) == 1126.83\nE       assert 1010.0 == 1126.83\nE        +  where 1010.0 = <function compound_interest at 0x7f0cd2f728e0>(1000, 0.12, 1, 12)\nE        +    where <function compound_interest at 0x7f0cd2f728e0> = money.compound_interest\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_compound_interest_periods_per_year - a...\n1 failed, 1 passed in 0.30s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "The one-line fix is correct and addresses the root cause. The rate was already divided by periods_per_year, but the exponent wasn't multiplied by it. It is now `n = years * periods_per_year`.\n\nI ran the issue repro, and `compound_interest(1000, 0.12, 1, 12)` returns 1126.83. The default case `(1000, 0.05, 2)` still returns 1102.5, and a fractional-year case also works. All 85 tests pass, and no existing tests were modified. The new tests in tests/test_issue_repro.py are reasonable.\n\nBefore merging, please drop the committed `__pycache__/*.pyc` files from the diff. They are build artifacts, and a `.gitignore` entry would keep them out. This doesn't affect the code change. You could also move the two new tests into tests/test_toolkit.py next to the existing compound_interest test.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

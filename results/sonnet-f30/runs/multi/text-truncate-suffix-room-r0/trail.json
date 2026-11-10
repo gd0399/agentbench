@@ -1,0 +1,78 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "researcher unavailable: work directly from the issue",
+   "instructions": "The researcher is unavailable: reproduce and localise the bug yourself first."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "generalist",
+   "reason": "The researcher and coder both failed, so the generalist is the remaining way to make progress. The bug is small and well specified, and the issue was reproduced. Escalating to a human isn't justified yet.",
+   "instructions": "Fix report.headline(text, limit) so the returned string, including the '...' suffix, is never longer than `limit`. Research is unavailable, so first locate headline() in the report component and confirm the cause yourself.\n\nRepro: report.headline('the art of war', 12) currently returns 'The Art of W...', which is 15 characters. The expected result is 'The Art o...', which is 11 characters. Don't copy the expected string blindly. Check the exact semantics against it.\n\nLikely cause: the code truncates to `limit` characters and then appends '...', so the ellipsis isn't counted. The fix is to truncate to limit - 3 characters before appending it.\n\nCheck these points:\n1. The expected output is 11 characters for limit 12. With limit-3 truncation you would get 'The Art of' (9 chars) plus '...', which is 12 characters. Work out whether 'The Art o...' follows from an off-by-one, a trailing-space strip, or something else. Look at the existing code, any docs, and any tests to find the intended contract. Then implement the contract the code and tests support, and mention any ambiguity in your summary.\n2. Text that is already within the limit must be returned unchanged, apart from existing title-casing.\n3. Handle tiny limits (less than or equal to 3) without errors or negative slicing.\n\nAdd or update regression tests, including the case from the issue. Run the test suite. In your summary, list the files you changed, the root cause, and any ambiguity about the expected output."
+  },
+  {
+   "step": 4,
+   "src": "generalist",
+   "dst": "escalate",
+   "reason": "coder and generalist both failed",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 1)",
+   "attempt": 1,
+   "recovered_by": "rule-based triage"
+  },
+  {
+   "agent": "researcher",
+   "error": "InjectedFailure: injected failure in researcher (call 2)",
+   "attempt": 2,
+   "recovered_by": "coder"
+  },
+  {
+   "agent": "coder",
+   "error": "InjectedFailure: injected failure in coder (call 2)",
+   "attempt": 2,
+   "recovered_by": "generalist"
+  },
+  {
+   "agent": "generalist",
+   "error": "InjectedFailure: injected failure in generalist (call 2)",
+   "attempt": 2,
+   "recovered_by": "escalate"
+  }
+ ],
+ "trace": [
+  "researcher: FAILED -> coder",
+  "coder: FAILED -> generalist",
+  "generalist: FAILED -> escalate",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "headline() is longer than the limit"
+ },
+ "research": {
+  "reproduced": true,
+  "degraded": true,
+  "suspected_files": [],
+  "root_cause": "researcher unavailable; not yet investigated"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

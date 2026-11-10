@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "The issue assumes that every year divisible by 4 is a leap year. That ignores the century exception in the Gregorian calendar.",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

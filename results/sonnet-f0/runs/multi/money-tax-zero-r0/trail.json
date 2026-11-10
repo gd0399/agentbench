@@ -1,0 +1,65 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "Research reproduced the bug and found the root cause: the guard in toolkit/money.py tax() uses `rate <= 0` and rejects 0. No existing tests conflict. The fix is small and well defined.",
+   "instructions": "In toolkit/money.py, in tax() (around line 31), change the guard from `if rate <= 0:` to `if rate < 0:`. Keep the error message \"rate must be non-negative\". Don't change anything else in report.py. Keep the repro test tests/test_issue_repro.py (it asserts invoice_total([(1, 100.0)], tax_rate=0) == 100.0). Consider adding a test that tax(100, 0) returns 0 and that a negative rate still raises ValueError. Run the full test suite and confirm it passes, including the repro test."
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "report",
+  "summary": "report.invoice_total raises ValueError when tax_rate=0 (tax-free invoices); expected to return the untaxed subtotal, e.g. 100.0 for [(1, 100.0)]. Likely a falsy check on tax_rate (e.g. `if not tax_rate`) or a validation rejecting 0 in toolkit/report.py (or a helper in toolkit/money.py)."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/money.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "toolkit/money.py line 31, in tax(): the guard is `if rate <= 0: raise ValueError(\"rate must be non-negative\")`. It rejects rate == 0 even though the error message says only negative rates are invalid. report.invoice_total (toolkit/report.py:26) passes tax_rate=0, which is also its default, to money.tax, so it raises. The fix is to change the guard to `rate < 0`. No existing test expects tax(\u2026, 0) to raise; test_tax only checks 0.08. The repro test tests/test_issue_repro.py fails with ValueError.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_invoice_total_tax_free __________________________\n\n    def test_invoice_total_tax_free():\n>       assert report.invoice_total([(1, 100.0)], tax_rate=0) == 100.0\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_issue_repro.py:5: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntoolkit/report.py:26: in invoice_total\n    return round(discounted + money.tax(discounted, tax_rate), 2)\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\namount = 100.0, rate = 0\n\n    def tax(amount, rate):\n        if rate <= 0:\n>           raise ValueError(\"rate must be non-negative\")\nE           ValueError: rate must be non-negative\n\ntoolkit/money.py:32: ValueError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_invoice_total_tax_free - ValueError: r...\n1 failed in 0.25s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause is the guard in money.tax(). It used `rate <= 0`, which contradicts its own error message (\"must be non-negative\"). It also made invoice_total fail with the default tax_rate=0. Changing it to `rate < 0` fixes that for every caller, not only the repro input. Negative rates still raise.\n\nI read report.invoice_total and checked the other uses of tax(). Nothing else depends on the old behaviour.\n\nThe full suite passes (86 tests). The existing tests were not modified. The new tests cover zero and negative rates, plus an end-to-end repro test.\n\nBefore merging, drop the committed __pycache__/*.pyc files from the diff and consider adding a .gitignore. They are test-run artifacts and shouldn't be in the patch. The source change itself is a one-line fix.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

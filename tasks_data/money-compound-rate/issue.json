@@ -1,0 +1,7 @@
+{
+  "number": 144,
+  "title": "monthly compounding wildly overstates interest",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`money.compound_interest(1000, 0.12, 1, 12)` returns `3895.98`. Expected: `1126.83`.\n\nThanks for the great library!",
+  "author": "t-nakamura",
+  "labels": []
+}

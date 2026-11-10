@@ -1,0 +1,7 @@
+{
+  "number": 119,
+  "title": "word_count counts extra words with repeated spaces",
+  "body": "**Describe the bug**\nCalling `text.word_count('  the quick  brown fox ')` returns `8`, but it should return `4`.\n\n**To reproduce**\n```python\nfrom toolkit import text\nprint(text.word_count('  the quick  brown fox '))\n```\n\n**Expected behaviour**\nExpected: `4`\n\n**Environment**\nPython 3.12, toolkit main",
+  "author": "octocat",
+  "labels": []
+}

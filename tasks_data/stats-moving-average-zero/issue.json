@@ -1,0 +1,7 @@
+{
+  "number": 112,
+  "title": "moving_average(window=0) raises ZeroDivisionError instead of ValueError",
+  "body": "### What happened?\n`stats.moving_average([1, 2], 0)` raises `ZeroDivisionError`.\n\n### What did you expect?\nIt should raise `ValueError` (expected: `raise ValueError`).\n\n### Version\nlatest main",
+  "author": "t-nakamura",
+  "labels": []
+}

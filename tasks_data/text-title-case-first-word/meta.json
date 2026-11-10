@@ -1,0 +1,20 @@
+{
+  "id": "text-title-case-first-word",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.title_case('the lord of the rings')",
+  "expected": "'The Lord of the Rings'",
+  "actual": {
+    "ok": true,
+    "repr": "'the Lord of the Rings'"
+  },
+  "failing_hidden_tests": [
+    "test_headline",
+    "test_title_case",
+    "test_title_case_first_minor"
+  ],
+  "visible_tests": 81
+}

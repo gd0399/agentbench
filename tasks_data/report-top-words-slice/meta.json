@@ -1,0 +1,19 @@
+{
+  "id": "report-top-words-slice",
+  "kind": "bug",
+  "category": "off-by-one",
+  "file": "toolkit/report.py",
+  "component": "report",
+  "difficulty": "hard",
+  "expr": "report.top_words('z y x', 2)",
+  "expected": "['x', 'y']",
+  "actual": {
+    "ok": true,
+    "repr": "['x']"
+  },
+  "failing_hidden_tests": [
+    "test_top_words",
+    "test_top_words_tie_alpha"
+  ],
+  "visible_tests": 82
+}

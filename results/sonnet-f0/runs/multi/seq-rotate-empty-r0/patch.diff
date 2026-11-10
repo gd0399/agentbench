@@ -1,0 +1,35 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..7a60b85
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++__pycache__/
++*.pyc
+diff --git a/tests/test_toolkit.py b/tests/test_toolkit.py
+index 1cb4d8c..7a6bc2e 100644
+--- a/tests/test_toolkit.py
++++ b/tests/test_toolkit.py
+@@ -152,6 +152,9 @@ def test_rotate_zero():
+ def test_rotate_wrap():
+     assert seq.rotate([1, 2, 3], 4) == [3, 1, 2]
+ 
++def test_rotate_empty():
++    assert seq.rotate([], 3) == []
++
+ def test_sliding_window():
+     assert seq.sliding_window([1, 2, 3, 4], 3) == [(1, 2, 3), (2, 3, 4)]
+ 
+diff --git a/toolkit/seq.py b/toolkit/seq.py
+index e33565e..fce5c3d 100644
+--- a/toolkit/seq.py
++++ b/toolkit/seq.py
+@@ -30,6 +30,8 @@ def dedupe(items):
+ 
+ def rotate(items, k):
+     """Rotate right by k positions."""
++    if not items:
++        return items[:]
+     k = k % len(items)
+     return items[-k:] + items[:-k]
+ 

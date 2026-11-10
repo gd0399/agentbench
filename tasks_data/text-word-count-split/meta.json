@@ -1,0 +1,19 @@
+{
+  "id": "text-word-count-split",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "easy",
+  "expr": "text.word_count('  the quick  brown fox ')",
+  "expected": "4",
+  "actual": {
+    "ok": true,
+    "repr": "8"
+  },
+  "failing_hidden_tests": [
+    "test_word_count",
+    "test_word_count_empty"
+  ],
+  "visible_tests": 82
+}

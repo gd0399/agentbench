@@ -1,0 +1,18 @@
+{
+  "id": "stats-variance-population",
+  "kind": "bug",
+  "category": "arithmetic",
+  "file": "toolkit/stats.py",
+  "component": "stats",
+  "difficulty": "hard",
+  "expr": "stats.variance([2, 4, 4, 4, 5, 5, 7, 9])",
+  "expected": "4.571428571428571",
+  "actual": {
+    "ok": true,
+    "repr": "4.0"
+  },
+  "failing_hidden_tests": [
+    "test_variance_sample"
+  ],
+  "visible_tests": 83
+}

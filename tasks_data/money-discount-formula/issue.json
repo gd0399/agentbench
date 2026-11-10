@@ -1,0 +1,7 @@
+{
+  "number": 140,
+  "title": "apply_discount returns the discount instead of the price",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`money.apply_discount(80.0, 25)` returns `20.0`. Expected: `60.0`.\n\nThanks for the great library!",
+  "author": "kwame-a",
+  "labels": []
+}

@@ -1,0 +1,7 @@
+{
+  "number": 103,
+  "title": "median of odd-length list is wrong",
+  "body": "Hi! I ran into this while using toolkit in production.\n\n`stats.median([3, 1, 2])` returns `1.5`. Expected: `2`.\n\nThanks for the great library!",
+  "author": "mlopez",
+  "labels": []
+}

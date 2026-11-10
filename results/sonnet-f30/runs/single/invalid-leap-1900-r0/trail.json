@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "A year divisible by 100 is a leap year only if it is also divisible by 400. 1900 is not divisible by 400, so it is not a leap year. The implementation in `toolkit/dates.py` follows this rule. `tests/test_toolkit.py::test_leap_years` explicitly asserts `is_leap_year(1900)` is False, and 2000 is True.",
+  "suspected_files": [
+   "toolkit/dates.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

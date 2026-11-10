@@ -1,0 +1,43 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "escalate",
+   "reason": "Research shows median() returning 2.5 for even-length input is intended: it is the standard statistical median, and test_median_even and test_report both assert it. Changing it to return the lower middle element would break those tests and the summarize report. The reporter's request is really a feature request (e.g. a separate median_low()) or a won't-fix. A human should decide, so the coder should not be sent to change median().",
+   "instructions": "Hand to a maintainer with this summary. The behaviour is working as designed: stats.median returns the mean of the two middle values for even-length lists, and tests/test_toolkit.py::test_median_even and the report summary test depend on that. Suggested options are (1) close the issue as working as designed, or (2) accept a feature request for a new median_low() function and leave median() unchanged. The repro test tests/test_issue_repro.py encodes the reporter's expectation and contradicts the existing contract. It should not be merged as written."
+  }
+ ],
+ "errors": [],
+ "trace": [
+  "researcher: ok",
+  "close: escalated"
+ ],
+ "triage": {
+  "kind": "question",
+  "severity": "low",
+  "component": "stats",
+  "summary": "Reporter expects stats.median([1, 2, 3, 4]) to return 2 (the lower middle element), but it returns 2.5. 2.5 is the standard statistical median, the mean of the two middle values, so this is probably intended behavior and not a bug. Check the docs and tests for the intended contract. If a lower-median is wanted, treat it as a feature request, such as a separate median_low() function as in Python's statistics module. Otherwise close it as working as designed."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/stats.py",
+   "tests/test_toolkit.py",
+   "toolkit/report.py"
+  ],
+  "root_cause": "The behaviour is reported accurately, but it is intended. toolkit/stats.py median() (lines 10-18) returns the mean of the two middle values for even-length input: `(ordered[mid-1] + ordered[mid]) / 2`. That is the standard statistical median. The existing test tests/test_toolkit.py::test_median_even asserts `median([4,1,3,2]) == 2.5`. test_report also asserts `'median': 2.5` for report.summarize([1,2,3,4]) (line 246). The repro test in tests/test_issue_repro.py, which asserts 2, fails on the current code with 2.5, so the repro does reproduce. The request contradicts tested behaviour. Changing median() would break those tests and the summarize report. The reporter's wish for the lower middle element is a feature request, for example a separate median_low() like Python's statistics.median_low. It is not a bug in median().",
+  "conflicts_with_tests": true,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n____________________ test_median_even_returns_lower_middle _____________________\n\n    def test_median_even_returns_lower_middle():\n>       assert stats.median([1, 2, 3, 4]) == 2\nE       assert 2.5 == 2\nE        +  where 2.5 = <function median at 0x7fa509292700>([1, 2, 3, 4])\nE        +    where <function median at 0x7fa509292700> = stats.median\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_median_even_returns_lower_middle - ass...\n1 failed in 0.02s\n"
+ },
+ "review": null,
+ "resolution": "needs a human"
+}

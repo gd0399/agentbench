@@ -1,0 +1,19 @@
+{
+ "handoffs": [],
+ "errors": [],
+ "trace": [
+  "single: ok",
+  "close: invalid"
+ ],
+ "triage": null,
+ "research": {
+  "root_cause": "There is no bug. toolkit/stats.py:median averages the two middle elements for even-length input, as intended. If a lower-median is wanted, it should be added as a separate function or option, not by changing median().",
+  "suspected_files": [
+   "toolkit/stats.py"
+  ],
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py"
+ },
+ "review": null,
+ "resolution": "invalid"
+}

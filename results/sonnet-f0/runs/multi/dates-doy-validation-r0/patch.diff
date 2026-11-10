@@ -1,0 +1,97 @@
+diff --git a/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..8cfa3bc
+Binary files /dev/null and b/__pycache__/conftest.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_day_of_year_validation.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_day_of_year_validation.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..ac10aca
+Binary files /dev/null and b/tests/__pycache__/test_day_of_year_validation.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..4dde7c6
+Binary files /dev/null and b/tests/__pycache__/test_issue_repro.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..ca7a4ae
+Binary files /dev/null and b/tests/__pycache__/test_toolkit.cpython-313-pytest-9.1.1.pyc differ
+diff --git a/tests/test_day_of_year_validation.py b/tests/test_day_of_year_validation.py
+new file mode 100644
+index 0000000..a08d874
+--- /dev/null
++++ b/tests/test_day_of_year_validation.py
+@@ -0,0 +1,17 @@
++import pytest
++from toolkit import dates
++
++
++@pytest.mark.parametrize("args", [
++    (2023, 0, 1), (2023, 13, 1), (2023, 1, 0), (2023, 1, 32),
++    (2023, 4, 31), (2023, 2, 29), (1900, 2, 29), (2024, 2, 30),
++])
++def test_invalid_dates_raise(args):
++    with pytest.raises(ValueError):
++        dates.day_of_year(*args)
++
++
++def test_valid_dates():
++    assert dates.day_of_year(2023, 3, 1) == 60
++    assert dates.day_of_year(2024, 12, 31) == 366
++    assert dates.day_of_year(2000, 2, 29) == 60
+diff --git a/tests/test_issue_repro.py b/tests/test_issue_repro.py
+new file mode 100644
+index 0000000..26aa8f1
+--- /dev/null
++++ b/tests/test_issue_repro.py
+@@ -0,0 +1,11 @@
++import pytest
++from toolkit import dates
++
++
++def test_feb29_non_leap_raises():
++    with pytest.raises(ValueError):
++        dates.day_of_year(2023, 2, 29)
++
++
++def test_feb29_leap_ok():
++    assert dates.day_of_year(2024, 2, 29) == 60
+diff --git a/toolkit/__pycache__/__init__.cpython-313.pyc b/toolkit/__pycache__/__init__.cpython-313.pyc
+new file mode 100644
+index 0000000..da1bec7
+Binary files /dev/null and b/toolkit/__pycache__/__init__.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/dates.cpython-313.pyc b/toolkit/__pycache__/dates.cpython-313.pyc
+new file mode 100644
+index 0000000..1ba7c57
+Binary files /dev/null and b/toolkit/__pycache__/dates.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/money.cpython-313.pyc b/toolkit/__pycache__/money.cpython-313.pyc
+new file mode 100644
+index 0000000..672fe41
+Binary files /dev/null and b/toolkit/__pycache__/money.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/report.cpython-313.pyc b/toolkit/__pycache__/report.cpython-313.pyc
+new file mode 100644
+index 0000000..c53d2ba
+Binary files /dev/null and b/toolkit/__pycache__/report.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/seq.cpython-313.pyc b/toolkit/__pycache__/seq.cpython-313.pyc
+new file mode 100644
+index 0000000..d39c78c
+Binary files /dev/null and b/toolkit/__pycache__/seq.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/stats.cpython-313.pyc b/toolkit/__pycache__/stats.cpython-313.pyc
+new file mode 100644
+index 0000000..f854d10
+Binary files /dev/null and b/toolkit/__pycache__/stats.cpython-313.pyc differ
+diff --git a/toolkit/__pycache__/text.cpython-313.pyc b/toolkit/__pycache__/text.cpython-313.pyc
+new file mode 100644
+index 0000000..7a59772
+Binary files /dev/null and b/toolkit/__pycache__/text.cpython-313.pyc differ
+diff --git a/toolkit/dates.py b/toolkit/dates.py
+index 67ad236..a288e2f 100644
+--- a/toolkit/dates.py
++++ b/toolkit/dates.py
+@@ -22,7 +22,7 @@ def quarter_of(month):
+ 
+ 
+ def day_of_year(year, month, day):
+-    if day < 1 or day > 31:
++    if day < 1 or day > days_in_month(year, month):
+         raise ValueError("invalid day")
+     total = 0
+     for m in range(1, month):

@@ -1,0 +1,7 @@
+{
+  "number": 118,
+  "title": "headline() is longer than the limit",
+  "body": "### What happened?\n`report.headline('the art of war', 12)` returns `'The Art of W...'`.\n\n### What did you expect?\nIt should return `'The Art o...'` (expected: `'The Art o...'`).\n\n### Version\nlatest main",
+  "author": "priya-r",
+  "labels": []
+}

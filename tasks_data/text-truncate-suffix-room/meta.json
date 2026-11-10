@@ -1,0 +1,19 @@
+{
+  "id": "text-truncate-suffix-room",
+  "kind": "bug",
+  "category": "cross-module",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "report.headline('the art of war', 12)",
+  "expected": "'The Art o...'",
+  "actual": {
+    "ok": true,
+    "repr": "'The Art of W...'"
+  },
+  "failing_hidden_tests": [
+    "test_headline",
+    "test_truncate_long"
+  ],
+  "visible_tests": 82
+}

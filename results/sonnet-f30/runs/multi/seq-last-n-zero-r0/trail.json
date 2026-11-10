@@ -1,0 +1,71 @@
+{
+ "handoffs": [
+  {
+   "step": 1,
+   "src": "start",
+   "dst": "researcher",
+   "reason": "reproduce the issue and localise the root cause",
+   "instructions": ""
+  },
+  {
+   "step": 2,
+   "src": "researcher",
+   "dst": "coder",
+   "reason": "write a fix",
+   "instructions": ""
+  },
+  {
+   "step": 3,
+   "src": "coder",
+   "dst": "reviewer",
+   "reason": "review the patch",
+   "instructions": ""
+  },
+  {
+   "step": 4,
+   "src": "reviewer",
+   "dst": "open_pr",
+   "reason": "patch approved",
+   "instructions": ""
+  }
+ ],
+ "errors": [
+  {
+   "agent": "supervisor",
+   "error": "injected failure in supervisor (call 2)",
+   "attempt": 1,
+   "recovered_by": "rule-based routing"
+  }
+ ],
+ "trace": [
+  "researcher: ok",
+  "coder: ok",
+  "reviewer: ok",
+  "open_pr: ok"
+ ],
+ "triage": {
+  "kind": "bug",
+  "severity": "medium",
+  "component": "seq",
+  "summary": "seq.last_n(items, 0) returns the entire list instead of an empty list. Likely cause is the slice items[-n:], which with n=0 becomes items[-0:] == items[0:]. Fix: handle n <= 0 explicitly (return []) or use items[len(items)-n:] with bounds checks. Add a regression test for n=0."
+ },
+ "research": {
+  "reproduced": true,
+  "repro_test": "tests/test_issue_repro.py",
+  "suspected_files": [
+   "toolkit/seq.py"
+  ],
+  "root_cause": "toolkit/seq.py last_n (lines 74-77): the guard is `if n < 0: return []`, so n == 0 falls through to `items[-n:]`. That is `items[-0:]`, which equals `items[0:]`, so the whole list comes back. The guard should be `n <= 0`. The existing test only covers n=2, and nothing documents n=0 behaviour, so the expected `[]` doesn't contradict any test.",
+  "conflicts_with_tests": false,
+  "repro_output": "passed=0 failed=1 errors=0\nF                                                                        [100%]\n=================================== FAILURES ===================================\n_______________________________ test_last_n_zero _______________________________\n\n    def test_last_n_zero():\n>       assert seq.last_n([1, 2, 3], 0) == []\nE       assert [1, 2, 3] == []\nE         \nE         Left contains 3 more items, first extra item: 1\nE         Use -v to get more diff\n\ntests/test_issue_repro.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_repro.py::test_last_n_zero - assert [1, 2, 3] == []\n1 failed in 0.35s\n"
+ },
+ "review": {
+  "approved": true,
+  "tests_passed": true,
+  "repro_passed": true,
+  "feedback": "Approved. The root cause is that `-0` equals `0`, so `items[-0:]` is `items[0:]`, which is the whole list. Changing the guard to `n <= 0` fixes that. It is a one-token change in `toolkit/seq.py`, and it keeps the existing behaviour of returning [] for negative n. The full suite passes (84 tests), and the existing tests are unmodified. The new regression test in `tests/test_issue_repro.py` covers the reported case. n=0 is the only value affected, since `items[-n:]` is correct for every n >= 1.\n\nNits, not blocking:\n- The diff contains `__pycache__/*.pyc` files. They are test-run artifacts and shouldn't be committed. Drop them before merging, and consider adding a `.gitignore`.\n- The new test could be folded into `test_last_n` in `tests/test_toolkit.py`, and could also assert n larger than len(items) and a negative n.",
+  "reviewer": "reviewer",
+  "attempt": 1
+ },
+ "resolution": null
+}

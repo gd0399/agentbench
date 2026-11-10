@@ -1,0 +1,18 @@
+{
+  "id": "text-title-case-rest-lower",
+  "kind": "bug",
+  "category": "logic",
+  "file": "toolkit/text.py",
+  "component": "text",
+  "difficulty": "hard",
+  "expr": "text.title_case('hELLO wORLD')",
+  "expected": "'Hello World'",
+  "actual": {
+    "ok": true,
+    "repr": "'HELLO WORLD'"
+  },
+  "failing_hidden_tests": [
+    "test_title_case_mixed"
+  ],
+  "visible_tests": 83
+}
